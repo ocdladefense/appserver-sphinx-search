@@ -1,8 +1,13 @@
 {
-    "name": "ocdladefense/project",
-    "description": "",
+	"name": "ocdladefense/appserver-sphinx-search",
+    "description": "Module to implement the Sphinx fulltext search engine.",
     "type": "wordpress-theme",
-    "license": "MIT",
-    "authors": [],
-    "require": {}
+    "config": {
+        "preferred-install": {
+            "ocdladefense/*": "source"
+        }
+    },
+    "require": {
+        "ocdladefense/lib-sphinx-search": "dev-development"
+    }
 }

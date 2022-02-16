@@ -1,14 +1,12 @@
 {
-	"comment": "This is a module template",
-	"name": "module-template", 
-	"description": "A module for building other modules.",
-    "connectedApp":"default",
+	"name": "sphinx",
+	"description": "Perform SphinxSearch operations.",
+	"comment": "Module definition file.",
 	"files": [],
 	"routes": {
-        "example/route":{
-            "callback":"callbackName",
+        "example/search":{
+            "callback":"exampleSearch",
             "content-type":"text/html"
         }
     }
 }
-
