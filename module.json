@@ -5,7 +5,7 @@
 	"files": [],
 	"routes": {
         "example/search":{
-            "callback":"exampleSearch",
+            "callback":"exampleSearchUsingSphinxQLRemote",
             "content-type":"text/html"
         }
     }
