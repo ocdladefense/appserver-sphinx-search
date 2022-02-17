@@ -2,10 +2,15 @@
 	"name": "sphinx",
 	"description": "Perform SphinxSearch operations.",
 	"comment": "Module definition file.",
-	"files": [],
+	"files": ["DatabaseUtils.php"],
+    "connectedApp": "default",
 	"routes": {
         "example/search":{
             "callback":"exampleSearch",
+            "content-type":"text/html"
+        },
+        "search/test":{
+            "callback":"exampleSearchTest",
             "content-type":"text/html"
         }
     }
