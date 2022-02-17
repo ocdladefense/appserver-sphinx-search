@@ -8,64 +8,53 @@ class SphinxModule extends Module {
     }
 
 
+    // Main callback; return a call to the SphinxQL method.
     public function exampleSearch() {
+
+        return $this->exampleSearchUsingSphinxQL();
+    }
+
+
+    // If necessary, use the included SphinxApi client library.
+    // See ocdladefense/lib-sphinx-search for more info.
+    public function exampleSearchSphinxApi() {
 
 
 
         $cl = new SphinxClient(); // Will it work?
 
         
-        return "Hello World!";
-
+        return "Using SphinxApi client library!";
     }
+
+
+
+
     /**
-     * @method exampleSearch
+     * @method exampleSearchUsingSphinxQL
      * 
      * Example method to connect to a remote SphinxSearch server,
      * and return search results from a MATCH query.
      */
-    public function exampleSearchUsingSphinxQLLocal() {
+    public function exampleSearchUsingSphinxQL() {
 
-        $wgSphinxSearch_host = '172.31.47.173';
-        $wgSphinxSearch_port = 9312; // 9306 is our SphinxQL port - let's us use SQL syntax to query the search engine.
+        // Jose will update this IP with the public IP of OCDLA's database / search server.
+        // This is the Elastic IP of the Database Server.
+        $sphinxHost = "35.162.222.119"; 
 
-        $mysqli = new mysqli($wgSphinxSearch_host, "user", "password", "database", 9306);
+        // This is our SphinxQL port - let's us use SQL syntax to query the search engine.
+        $sphinxQLPort = 9306; 
 
+        // Alternate port when using the included SphinxApi.php library.
+        $sphinxApiPort = 9312; 
 
-        if ($mysqli->connect_error) die("Connection failed: " . $mysqli->connect_error);
-        // Perform an initial query to the Sphinx search engine.
-
-        // Configure our default database connection.
-        // Database::setDefault();
-
-        // Use this connection to perform a query.
-
-
-        // Iterate through the query results.
-
-
-
-        return "It works!";
-    }
-
-
-    /**
-     * @method exampleSearchUsingSphinxQLRemote
-     * 
-     * Example method to connect to a remote SphinxSearch server,
-     * and return search results from a MATCH query.
-     */
-    public function exampleSearchUsingSphinxQLRemote() {
-
-        $wgSphinxSearch_host = "35.162.222.119"; // Jose will update this IP with the public IP of OCDLA's database / search server.
-
-        $wgSphinxSearch_port = 9312; // 9306 is our SphinxQL port - let's us use SQL syntax to query the search engine.
-        // mysql -P9306 -h52.42.123.92 -protocol=tcp --prompt='sphinxQL> '"
-        // $mysqli = new Mysqli("52.42.123.92:9306","","","");
+        // Example CLI commands for testing availability of searchd.
+        // mysql -P9306 -h35.162.222.119 -protocol=tcp --prompt='sphinxQL> '"
+        // $mysqli = new Mysqli("35.162.222.119:9306","","","");
 
 
         /*
-        // PDO OPTION 
+        // PDO OPTION - We can use the PDO library when preferred.
         $dsn = 'mysql:host=35.162.222.119;port=9306';
 
         try {
@@ -74,10 +63,9 @@ class SphinxModule extends Module {
         } catch (PDOException $e) {
             throw new Exception($e->getMessage());
         }
-
         */
 
-        $link = mysqli_connect("35.162.222.119", "", "", "", 9306);
+        $link = mysqli_connect($sphinxHost, "", "", "", $sphinxQLPort);
         if (!$link) {
             echo "Error: Unable to connect to MySQL." . "<p>";
             echo "Debugging errno: " . mysqli_connect_errno() . "<p>";
@@ -86,8 +74,7 @@ class SphinxModule extends Module {
         }
         
   
-        // Configure our default database connection.
-        // Database::setDefault();
+
 
         // Use this connection to perform a query.
 
@@ -96,6 +83,6 @@ class SphinxModule extends Module {
 
 
 
-        return "It works!";
+        return "Using SphinxQL via Mysqli client library!";
     }
 }
