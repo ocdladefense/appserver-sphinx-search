@@ -87,9 +87,17 @@ class SphinxModule extends Module {
         $terms = "ocdla";
         $ql = "SELECT * FROM ocdla_products WHERE MATCH('%s')";
 
+        $qlsnippets = "CALL SNIPPETS('my ocdla product', 'ocdla_products', 'ocdla')";
+
         $query = sprintf($ql,$terms);
 
         $result = mysqli_query($conn, $query);
+
+        $snippetResult = mysqli_query($conn, $qlsnippets);
+
+        while($row = mysqli_fetch_assoc($snippetResult)) {
+            var_dump($row);
+        }
 
         
 
