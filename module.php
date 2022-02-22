@@ -87,7 +87,8 @@ class SphinxModule extends Module {
         $terms = "ocdla";
         $ql = "SELECT * FROM ocdla_products WHERE MATCH('%s')";
 
-        $qlsnippets = "CALL SNIPPETS('my ocdla product', 'ocdla_products', 'ocdla')";
+        $qlsnippets = "CALL SNIPPETS(('my ocdla product', 'my ocdla product 2'), 'ocdla_products', 'ocdla')";
+
 
         $query = sprintf($ql,$terms);
 
@@ -95,11 +96,8 @@ class SphinxModule extends Module {
 
         $snippetResult = mysqli_query($conn, $qlsnippets);
 
-        while($row = mysqli_fetch_assoc($snippetResult)) {
-            var_dump($row);
-        }
-
         
+
 
         // Iterate through the query results.
         while($row = mysqli_fetch_assoc($result)) {
@@ -108,33 +106,44 @@ class SphinxModule extends Module {
         }
 
         // Our list of proudct IDs.
-        var_dump($productIds);
 
 
-        
+        $fn = function($id){return "'{$id}'";};
+
+        $step1 = array_map($fn, $productIds);
+
+
+        $step2 = implode(",", $step1);
 
 
         // Per usual.
         $api = $this->loadForceApi();
 
+        $soql = sprintf("SELECT Id, Name, ClickpdxCatalog__HtmlDescription__c FROM Product2 WHERE Id IN (%s)", $step2);
+
+
+
 
         
-        $builder = DatabaseUtils::parse("SELECT Id, Name, Description FROM Product2 WHERE Id = '%s'", $productIds);
+        //$builder = DatabaseUtils::parse("SELECT Id, Name, Description FROM Product2 WHERE Id = '%s'", $productIds);
 
-        var_dump($builder);exit;
+        //select * from product2 where id in ('123', '124')
+
+        //var_dump($builder);exit;
 
 
         // How will we get this to work when needing to pass an array of Product IDs in?
-        $result = $api->query();
+        $result = $api->query($soql);
 
 
-        var_dump($result->getRecords());
 
-        exit;  
+        $html = array();
+
         // This is where we can print off the description.
-        foreach($results->getRecords() as $product) {
-
-
+        foreach($result->getRecords() as $product) {
+            $name = "<h2>{$product['Name']}</h2>";
+            $description = "<div>{$product['ClickpdxCatalog__HtmlDescription__c']}</div}";
+            $html[] = $name.$description;
         }
 
 
@@ -142,7 +151,7 @@ class SphinxModule extends Module {
 
         
 
-
+        return implode("\n", $html);
         if($debug) {
             exit;
         }
