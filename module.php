@@ -96,7 +96,6 @@ class SphinxModule extends Module {
 
         $snippetResult = mysqli_query($conn, $qlsnippets);
 
-        
 
 
         // Iterate through the query results.
@@ -137,12 +136,22 @@ class SphinxModule extends Module {
 
 
 
-        $html = array();
+        $html = array(); 
 
         // This is where we can print off the description.
         foreach($result->getRecords() as $product) {
-            $name = "<h2>{$product['Name']}</h2>";
-            $description = "<div>{$product['ClickpdxCatalog__HtmlDescription__c']}</div}";
+            $searchthrough = $product['ClickpdxCatalog__HtmlDescription__c'];
+            $qlsnippets = "CALL SNIPPETS('$searchthrough', 'ocdla_products', 'law', 5 AS around, 30 AS limit)";
+            $snippetResult = mysqli_query($conn, $qlsnippets);
+
+            $prodid = $product['Id'];
+            $shoplink = "https://ocdla.force.com/OcdlaProduct?id=$prodid";
+            $name = "<h2><a href='$shoplink' target='blank'>{$product['Name']}</a></h2>";
+            $rows = array();
+            while($row = mysqli_fetch_assoc($snippetResult)) {
+                $rows = $row;
+            }
+            $description = array_values($rows)[0];
             $html[] = $name.$description;
         }
 
@@ -262,9 +271,3 @@ class SphinxModule extends Module {
         else return "Using SphinxQL via Mysqli client library!";
     }
 }
-
-
-
-
-
-
