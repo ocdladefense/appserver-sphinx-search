@@ -96,13 +96,12 @@ class SphinxModule extends Module {
 
         $snippetResult = mysqli_query($conn, $qlsnippets);
 
-        
 
 
         // Iterate through the query results.
         while($row = mysqli_fetch_assoc($result)) {
             $productIds[] = $row["product_id"];
-            // var_dump($row);
+            //var_dump($row);
         }
 
         // Our list of proudct IDs.
@@ -137,25 +136,37 @@ class SphinxModule extends Module {
 
 
 
-        $html = array();
+        $html = array(); 
 
+        $alltext = array();
         // This is where we can print off the description.
         foreach($result->getRecords() as $product) {
-            $name = "<h2>{$product['Name']}</h2>";
-            $description = "<div>{$product['ClickpdxCatalog__HtmlDescription__c']}</div}";
-            $html[] = $name.$description;
+            $alltext[]= $product['ClickpdxCatalog__HtmlDescription__c'];
         }
 
+        $alltext = implode("','", $alltext);
+        $qlsnippets = "CALL SNIPPETS(('$alltext'), 'ocdla_products', 'law', 10 AS around, 256 AS limit, 1 AS query_mode, 'strip' AS html_strip_mode)";
+        $snippetResult = mysqli_query($conn, $qlsnippets);
+        
+        $rows = array();
+        $products = $result->getRecords();
+        $counter = 0;
+        while($row = mysqli_fetch_assoc($snippetResult)) {
+            $snippet = '<div>'.$row['snippet'].'</div>';
+            $product = $products[$counter];
+            $counter++;
 
-        // Now we want to get SNIPPETS with the highlighted search term(s).
-
+            $prodid = $product['Id'];
+            $shoplink = "https://ocdla.force.com/OcdlaProduct?id=$prodid";
+            $name = "<h2><a href='$shoplink' target='_blank'>{$product['Name']}</a></h2>";
+            
+            //$description = array_values($rows)[$snippet];
+            $html[] = '<div>'.$name.$snippet.'</div>';
+        }
         
 
         return implode("\n", $html);
-        if($debug) {
-            exit;
-        }
-        else return "Using SphinxQL via Mysqli client library!";
+        //return "foobar";
     }
 
 
@@ -262,9 +273,3 @@ class SphinxModule extends Module {
         else return "Using SphinxQL via Mysqli client library!";
     }
 }
-
-
-
-
-
-
