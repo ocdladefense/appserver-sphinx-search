@@ -12,15 +12,15 @@ class SphinxModule extends Module {
 
 
     // Main callback; return a call to the SphinxQL method.
-    public function exampleSearch() {
+    public function exampleSearch($terms) {
 
-        return $this->exampleSearchUsingSphinxQL();
+        return $this->exampleSearchUsingSphinxQL($terms);
     }
 
 
     // If necessary, use the included SphinxApi client library.
     // See ocdladefense/lib-sphinx-search for more info.
-    public function exampleSearchSphinxApi() {
+    public function exampleSearchSphinxApi($terms) {
 
 
 
@@ -39,7 +39,7 @@ class SphinxModule extends Module {
      * Example method to connect to a remote SphinxSearch server,
      * and return search results from a MATCH query.
      */
-    public function exampleSearchUsingSphinxQL() {
+    public function exampleSearchUsingSphinxQL($terms) {
 
         // If we're experimenting then let's not bother returning the theme.
         $debug = true;
@@ -58,6 +58,16 @@ class SphinxModule extends Module {
         // products using these IDs.
         $productIds = array();
 
+
+        // $terms = "duii";
+
+
+        $api = $this->loadForceApi();
+
+
+        $results_html = array(); 
+
+        $domain = "https://ocdla.force.com";
 
         // Example CLI commands for testing availability of searchd.
         // mysql -P9306 -h35.162.222.119 -protocol=tcp --prompt='sphinxQL> '"
@@ -84,19 +94,13 @@ class SphinxModule extends Module {
             exit;
         }
         
-        $terms = "ocdla";
+        
         $ql = "SELECT * FROM ocdla_products WHERE MATCH('%s')";
 
-        $qlsnippets = "CALL SNIPPETS(('my ocdla product', 'my ocdla product 2'), 'ocdla_products', 'ocdla')";
-
-
+  
         $query = sprintf($ql,$terms);
 
         $result = mysqli_query($conn, $query);
-
-        $snippetResult = mysqli_query($conn, $qlsnippets);
-
-
 
         // Iterate through the query results.
         while($row = mysqli_fetch_assoc($result)) {
@@ -116,7 +120,7 @@ class SphinxModule extends Module {
 
 
         // Per usual.
-        $api = $this->loadForceApi();
+        
 
         $soql = sprintf("SELECT Id, Name, ClickpdxCatalog__HtmlDescription__c FROM Product2 WHERE Id IN (%s)", $step2);
 
@@ -135,38 +139,42 @@ class SphinxModule extends Module {
         $result = $api->query($soql);
 
 
-
-        $html = array(); 
-
-        $alltext = array();
-        // This is where we can print off the description.
-        foreach($result->getRecords() as $product) {
-            $alltext[]= $product['ClickpdxCatalog__HtmlDescription__c'];
-        }
-
-        $alltext = implode("','", $alltext);
-        $qlsnippets = "CALL SNIPPETS(('$alltext'), 'ocdla_products', 'law', 10 AS around, 256 AS limit, 1 AS query_mode, 'strip' AS html_strip_mode)";
-        $snippetResult = mysqli_query($conn, $qlsnippets);
-        
-        $rows = array();
         $products = $result->getRecords();
-        $counter = 0;
-        while($row = mysqli_fetch_assoc($snippetResult)) {
-            $snippet = '<div>'.$row['snippet'].'</div>';
-            $product = $products[$counter];
-            $counter++;
 
-            $prodid = $product['Id'];
-            $shoplink = "https://ocdla.force.com/OcdlaProduct?id=$prodid";
-            $name = "<h2><a href='$shoplink' target='_blank'>{$product['Name']}</a></h2>";
+        
+        // var_dump($products);exit;
+ 
+
+        $desc = array_map(function($product) { return $product['ClickpdxCatalog__HtmlDescription__c'];}, $products);
+
+
+    
+        $qlsnippets = sprintf("CALL SNIPPETS(('%s'), 'ocdla_products', '%s', 10 AS around, 300 AS limit, 1 AS query_mode, 'strip' AS html_strip_mode, '<mark class=\"result\">' AS before_match, '</mark>' AS after_match, 1 AS force_all_words)",implode("','",$desc),$terms);
+
+        $snippets = mysqli_query($conn, $qlsnippets);
+        
+
+        
+        $counter = 0;
+        while($row = mysqli_fetch_assoc($snippets)) {
+            // var_dump($row);
+            $snippet = '<div style="line-height:15px;">'.$row['snippet'].'</div>';
+            $product = $products[$counter];
+            
+            $shoplink = "{$domain}/OcdlaProduct?id={$product['Id']}";
+            $name = "<h2 style='font-size:12pt;'><a href='{$shoplink}' target='_blank'>{$product['Name']}</a></h2>";
             
             //$description = array_values($rows)[$snippet];
-            $html[] = '<div>'.$name.$snippet.'</div>';
+            $html[] = '<div class="search-result" style="margin-bottom:14px;">'.$name.$snippet.'</div>';
+
+            $counter++;
         }
         
-
-        return implode("\n", $html);
+        $title = "<h2>Showing results for <i>{$terms}</i></h2>";
+        return $title . implode("\n", $html);
         //return "foobar";
+
+        exit;
     }
 
 

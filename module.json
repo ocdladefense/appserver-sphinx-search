@@ -5,7 +5,7 @@
 	"files": ["DatabaseUtils.php"],
     "connectedApp": "default",
 	"routes": {
-        "example/search":{
+        "example/search/%terms":{
             "callback":"exampleSearch",
             "content-type":"text/html"
         },
