@@ -108,6 +108,10 @@ class SphinxModule extends Module {
             //var_dump($row);
         }
 
+        if(count($productIds) < 1) {
+            return "No results found.";
+        }
+
         // Our list of proudct IDs.
 
 
@@ -145,11 +149,13 @@ class SphinxModule extends Module {
         // var_dump($products);exit;
  
 
-        $desc = array_map(function($product) { return $product['ClickpdxCatalog__HtmlDescription__c'];}, $products);
+        $desc = array_map(function($product) {
+            return empty($product['ClickpdxCatalog__HtmlDescription__c']) ? $product["Description"] : $product['ClickpdxCatalog__HtmlDescription__c'];
+        }, $products);
 
 
     
-        $qlsnippets = sprintf("CALL SNIPPETS(('%s'), 'ocdla_products', '%s', 10 AS around, 300 AS limit, 1 AS query_mode, 'strip' AS html_strip_mode, '<mark class=\"result\">' AS before_match, '</mark>' AS after_match, 1 AS force_all_words)",implode("','",$desc),$terms);
+        $qlsnippets = sprintf("CALL SNIPPETS(('%s'), 'ocdla_products', '%s', 10 AS around, 300 AS limit, 1 AS query_mode, 'strip' AS html_strip_mode, '<mark class=\"result\">' AS before_match, '</mark>' AS after_match)",implode("','",$desc),$terms);
 
         $snippets = mysqli_query($conn, $qlsnippets);
         
