@@ -150,7 +150,13 @@ class SphinxModule extends Module {
  
 
         $desc = array_map(function($product) {
-            return empty($product['ClickpdxCatalog__HtmlDescription__c']) ? $product["Description"] : $product['ClickpdxCatalog__HtmlDescription__c'];
+            $html = $product['ClickpdxCatalog__HtmlDescription__c'];
+            $standard = $product["Description"];
+
+            $html = utf8_decode($html);
+            $html = preg_replace('/\x{00A0}+/mis', " ", $html);
+            
+            return empty($html) ? $standard : $html;
         }, $products);
 
 
@@ -163,24 +169,28 @@ class SphinxModule extends Module {
         
         $counter = 0;
         while($row = mysqli_fetch_assoc($snippets)) {
-            // var_dump($row);
-            $snippet = '<div style="line-height:15px;">'.$row['snippet'].'</div>';
+        
+            $snippet = $row["snippet"];
+
+
+            
+            $snippet = str_replace('&nbsp;', ' ', $snippet);
+            $snippet = '<div style="line-height:15px;">'.$snippet."</div>";
             $product = $products[$counter];
             
             $shoplink = "{$domain}/OcdlaProduct?id={$product['Id']}";
             $name = "<h2 style='font-size:12pt;'><a href='{$shoplink}' target='_blank'>{$product['Name']}</a></h2>";
             
-            //$description = array_values($rows)[$snippet];
             $html[] = '<div class="search-result" style="margin-bottom:14px;">'.$name.$snippet.'</div>';
 
             $counter++;
         }
         
-        $title = "<h2>Showing results for <i>{$terms}</i></h2>";
-        return $title . implode("\n", $html);
-        //return "foobar";
-
-        exit;
+        $title = "<h2 class='summary'>Showing results for <i>{$terms}</i></h2>";
+        $tpl = new Template("widget");
+		$tpl->addPath(__DIR__ . "/templates");
+        
+        return  $tpl->render() . $title . implode("\n", $html);
     }
 
 
