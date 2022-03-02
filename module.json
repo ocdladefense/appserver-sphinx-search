@@ -12,6 +12,10 @@
         "search/test":{
             "callback":"exampleSearchTest",
             "content-type":"text/html"
+        },
+        "example/search":{
+            "callback":"exampleSearch",
+            "content-type":"text/html"
         }
     }
 }

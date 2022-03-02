@@ -12,8 +12,19 @@ class SphinxModule extends Module {
 
 
     // Main callback; return a call to the SphinxQL method.
-    public function exampleSearch($terms) {
-
+    public function exampleSearch($terms = null) {
+        if($terms == null)
+        {
+            $req = $this->getRequest();
+            $data = $req->getBody();
+            //var_dump($data);
+            //exit;
+            $terms = $data->term;
+            if($terms == null)
+            {
+                throw new exception("Search cannot be null");
+            }
+        }
         return $this->exampleSearchUsingSphinxQL($terms);
     }
 
@@ -95,18 +106,22 @@ class SphinxModule extends Module {
         }
         
         
-        $ql = "SELECT * FROM ocdla_products WHERE MATCH('%s')";
+        $ql = "SELECT Id, Product_Id FROM wiki_main WHERE MATCH('%s')";
 
   
         $query = sprintf($ql,$terms);
+
+        //print($query);
+        //exit;
 
         $result = mysqli_query($conn, $query);
 
         // Iterate through the query results.
         while($row = mysqli_fetch_assoc($result)) {
             $productIds[] = $row["product_id"];
-            //var_dump($row);
+            var_dump($row);
         }
+        exit;
 
         if(count($productIds) < 1) {
             return "No results found.";
@@ -172,7 +187,7 @@ class SphinxModule extends Module {
         
             $snippet = $row["snippet"];
 
-
+            //Each type of search result will have its own class.
             
             $snippet = str_replace('&nbsp;', ' ', $snippet);
             $snippet = '<div style="line-height:15px;">'.$snippet."</div>";
