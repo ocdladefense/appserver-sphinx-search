@@ -106,7 +106,7 @@ class SphinxModule extends Module {
         }
         
         
-        $ql = "SELECT Id, Product_Id FROM wiki_main WHERE MATCH('%s')";
+        $ql = "SELECT Id, Product_Id FROM ocdla_products WHERE MATCH('%s')";
 
   
         $query = sprintf($ql,$terms);
@@ -119,9 +119,7 @@ class SphinxModule extends Module {
         // Iterate through the query results.
         while($row = mysqli_fetch_assoc($result)) {
             $productIds[] = $row["product_id"];
-            var_dump($row);
         }
-        exit;
 
         if(count($productIds) < 1) {
             return "No results found.";
