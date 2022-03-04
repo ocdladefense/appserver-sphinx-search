@@ -2,7 +2,7 @@
 	"name": "sphinx",
 	"description": "Perform SphinxSearch operations.",
 	"comment": "Module definition file.",
-	"files": ["DatabaseUtils.php"],
+	"files": ["DatabaseUtils.php", "SearchResultBase.php", "SearchResultProducts.php", "SearchResultWikiMain.php"],
     "connectedApp": "default",
 	"routes": {
         "example/search/%terms":{

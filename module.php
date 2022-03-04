@@ -67,8 +67,7 @@ class SphinxModule extends Module {
 
         // We'll perform a secondary $api query for the actual Salesforce 
         // products using these IDs.
-        $productIds = array();
-
+        //$productIds = array();
 
         // $terms = "duii";
 
@@ -106,20 +105,58 @@ class SphinxModule extends Module {
         }
         
         
-        $ql = "SELECT Id, Product_Id FROM ocdla_products WHERE MATCH('%s')";
+        //$ql = "SELECT Id, Product_Id FROM ocdla_products WHERE MATCH('%s')";
 
+        //@@relaxed
+
+        $indexes = "ocdla_products, wiki_main";
+
+        $ql = "SELECT * FROM %s WHERE MATCH('%s')";
   
-        $query = sprintf($ql,$terms);
+        $query = sprintf($ql,$indexes, $terms);
 
-        //print($query);
+        //$ql2 = " WHERE MATCH('%s') ORDER BY indexname ASC";
+
+        //$query .= sprintf($ql2,$terms);
+
+        print($query);
         //exit;
 
         $result = mysqli_query($conn, $query);
 
+        //var_dump($result);
+        //exit;
+
+        //Holds doc ids for products
+        $prodIds = array();
+        $wikiIds = array();
+
+        //$snippetBuilder = new SearchResultProducts($conn);
+
+        $registered = array(
+            "ocdla_products" => "SearchResultProducts",
+            "wiki_main" => "SearchResultWikiMain"
+        );
         // Iterate through the query results.
         while($row = mysqli_fetch_assoc($result)) {
-            $productIds[] = $row["product_id"];
+            $myClass = $registered[$row["indexname"]];
+            $myClass::addResult($row);
+            //var_dump($name);
+            //$productIds[] = $row["product_id"];
+            //var_dump($row);
         }
+        //var_dump($prodIds);
+        //var_dump($wikiIds);
+        exit;
+
+        
+        while($row = mysqli_fetch_assoc($result))
+        {
+            $productIds[] = $row["product_id"];
+            //var_dump($row);
+        }
+        //exit;
+
 
         if(count($productIds) < 1) {
             return "No results found.";
@@ -206,6 +243,7 @@ class SphinxModule extends Module {
         return  $tpl->render() . $title . implode("\n", $html);
     }
 
+    
 
 
     public function exampleSearchTest() {
