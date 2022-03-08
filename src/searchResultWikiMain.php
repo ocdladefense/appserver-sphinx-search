@@ -5,6 +5,8 @@ class SearchResultWikiMain{
 
     private static $ids = array();
 
+    private static $results = array();
+
     public function __construct($conn)
     {
         $this->conn = $conn;
@@ -13,6 +15,17 @@ class SearchResultWikiMain{
     public static function addResult($r)
     {
         self::$ids[] = $r;
+    }
+
+    public static function enqueue($r)
+    {
+        self::$results[] = $r;
+    }
+
+    public static function dequeue()
+    {
+        $result = array_shift(self::$results);
+        return $result;
     }
 
     public function getDocs()
@@ -25,6 +38,13 @@ class SearchResultWikiMain{
             https://libraryofdefense.ocdla.org/page_namespace
 
         */
+
+        $db = new Mysql\Database();
+        $query = "SELECT * FROM page limit 20";
+        $result = $db->select($query);
+
+        
+
 
         foreach( $docIds as $page_id ) {
 			$res = $this->db->select(

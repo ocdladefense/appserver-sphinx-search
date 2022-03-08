@@ -52,6 +52,18 @@ class SphinxModule extends Module {
      */
     public function exampleSearchUsingSphinxQL($terms) {
 
+        $db = new Mysql\Database();
+        $query = "SELECT page_id, 'wiki_main' AS indexname, page_title, page_namespace, page_is_redirect, old_id, old_text FROM page, revision, text WHERE rev_id=page_latest AND old_id=rev_text_id AND page_id LIMIT 20";
+        $results = $db->select($query);
+        //var_dump($results);
+
+        foreach($results as $result)
+        {
+            var_dump($result);
+        }
+
+        exit;
+
         // If we're experimenting then let's not bother returning the theme.
         $debug = true;
 
@@ -119,7 +131,7 @@ class SphinxModule extends Module {
 
         //$query .= sprintf($ql2,$terms);
 
-        print($query);
+        //print($query);
         //exit;
 
         $result = mysqli_query($conn, $query);
@@ -140,13 +152,17 @@ class SphinxModule extends Module {
         // Iterate through the query results.
         while($row = mysqli_fetch_assoc($result)) {
             $myClass = $registered[$row["indexname"]];
-            $myClass::addResult($row);
+            //var_dump($myClass);
+            $myClass::addResult($row["alt_id"]);
             //var_dump($name);
             //$productIds[] = $row["product_id"];
-            //var_dump($row);
+            var_dump($row);
         }
         //var_dump($prodIds);
         //var_dump($wikiIds);
+
+        //$class = new SearchResultProducts($conn);
+        //$class->buildSnippets($api, $terms);
         exit;
 
         
