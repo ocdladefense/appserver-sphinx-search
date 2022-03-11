@@ -1,15 +1,14 @@
 <?php
 
-class SearchResultProducts extends Salesforce\RestApiRequest{
-    private $conn;
+class SearchResultProducts{
 
     private static $ids = array();
 
     private static $results = array();
 
-    public function __construct($conn)
+    public function __construct()
     {
-        $this->conn = $conn;
+
     }
 
     public static function addResult($r)
@@ -28,7 +27,7 @@ class SearchResultProducts extends Salesforce\RestApiRequest{
         return $result;
     }
 
-    public function buildSnippets($terms)
+    public static function buildSnippets($terms, $conn, $api)
     {
 
         //var_dump(self::$ids);
@@ -65,11 +64,13 @@ class SearchResultProducts extends Salesforce\RestApiRequest{
             return empty($html) ? $standard : $html;
         }, $products);
 
-
+        var_dump($desc);
     
         $qlsnippets = sprintf("CALL SNIPPETS(('%s'), 'ocdla_products', '%s', 10 AS around, 300 AS limit, 1 AS query_mode, 'strip' AS html_strip_mode, '<mark class=\"result\">' AS before_match, '</mark>' AS after_match)",implode("','",$desc),$terms);
 
-        $snippets = mysqli_query($this->conn, $qlsnippets);
+        $snippets = mysqli_query($conn, $qlsnippets);
+        var_dump($snippets);
+
 
         
         $counter = 0;

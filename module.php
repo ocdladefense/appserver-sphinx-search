@@ -52,18 +52,6 @@ class SphinxModule extends Module {
      */
     public function exampleSearchUsingSphinxQL($terms) {
 
-        $db = new Mysql\Database();
-        $query = "SELECT page_id, 'wiki_main' AS indexname, page_title, page_namespace, page_is_redirect, old_id, old_text FROM page, revision, text WHERE rev_id=page_latest AND old_id=rev_text_id AND page_id LIMIT 20";
-        $results = $db->select($query);
-        //var_dump($results);
-
-        foreach($results as $result)
-        {
-            var_dump($result);
-        }
-
-        exit;
-
         // If we're experimenting then let's not bother returning the theme.
         $debug = true;
 
@@ -121,7 +109,7 @@ class SphinxModule extends Module {
 
         //@@relaxed
 
-        $indexes = "ocdla_products, wiki_main";
+        $indexes = "wiki_main, ocdla_products";
 
         $ql = "SELECT * FROM %s WHERE MATCH('%s')";
   
@@ -156,15 +144,23 @@ class SphinxModule extends Module {
             $myClass::addResult($row["alt_id"]);
             //var_dump($name);
             //$productIds[] = $row["product_id"];
-            var_dump($row);
+            //var_dump($row);
         }
-        //var_dump($prodIds);
-        //var_dump($wikiIds);
 
-        //$class = new SearchResultProducts($conn);
-        //$class->buildSnippets($api, $terms);
+        //$class = new SearchResultWikiMain();
+        //$class->buildSnippets($terms, $conn);
+        
+
+        $snippetIndexes = explode(", ", $indexes);
+        foreach($snippetIndexes as $snippetIndex)
+        {
+            $myClass = $registered[$snippetIndex];
+            $myClass::buildSnippets($terms, $conn, $api);
+        }
         exit;
 
+
+        /*
         
         while($row = mysqli_fetch_assoc($result))
         {
@@ -250,7 +246,7 @@ class SphinxModule extends Module {
             $html[] = '<div class="search-result" style="margin-bottom:14px;">'.$name.$snippet.'</div>';
 
             $counter++;
-        }
+        }*/
         
         $title = "<h2 class='summary'>Showing results for <i>{$terms}</i></h2>";
         $tpl = new Template("widget");
