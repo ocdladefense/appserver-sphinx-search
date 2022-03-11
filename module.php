@@ -67,7 +67,7 @@ class SphinxModule extends Module {
 
         // We'll perform a secondary $api query for the actual Salesforce 
         // products using these IDs.
-        $productIds = array();
+        $record_ids = array();
 
 
         // $terms = "duii";
@@ -106,7 +106,7 @@ class SphinxModule extends Module {
         }
         
         
-        $ql = "SELECT Id, Product_Id FROM ocdla_products WHERE MATCH('%s')";
+        $ql = "SELECT id, alt_id FROM ocdla_products WHERE MATCH('%s')";
 
   
         $query = sprintf($ql,$terms);
@@ -118,10 +118,10 @@ class SphinxModule extends Module {
 
         // Iterate through the query results.
         while($row = mysqli_fetch_assoc($result)) {
-            $productIds[] = $row["product_id"];
+            $record_ids[] = $row["alt_id"];
         }
 
-        if(count($productIds) < 1) {
+        if(count($record_ids) < 1) {
             return "No results found.";
         }
 
@@ -130,7 +130,7 @@ class SphinxModule extends Module {
 
         $fn = function($id){return "'{$id}'";};
 
-        $step1 = array_map($fn, $productIds);
+        $step1 = array_map($fn, $record_ids);
 
 
         $step2 = implode(",", $step1);
@@ -144,13 +144,6 @@ class SphinxModule extends Module {
 
 
 
-        
-        //$builder = DatabaseUtils::parse("SELECT Id, Name, Description FROM Product2 WHERE Id = '%s'", $productIds);
-
-        //select * from product2 where id in ('123', '124')
-
-        //var_dump($builder);exit;
-
 
         // How will we get this to work when needing to pass an array of Product IDs in?
         $result = $api->query($soql);
@@ -159,8 +152,7 @@ class SphinxModule extends Module {
         $products = $result->getRecords();
 
         
-        // var_dump($products);exit;
- 
+    
 
         $desc = array_map(function($product) {
             $html = $product['ClickpdxCatalog__HtmlDescription__c'];
