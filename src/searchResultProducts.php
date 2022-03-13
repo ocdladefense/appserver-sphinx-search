@@ -1,6 +1,6 @@
 <?php
 
-class SearchResultProducts{
+class SearchResultProducts extends SearchResultBase{
 
     private static $ids = array();
 
@@ -47,14 +47,14 @@ class SearchResultProducts{
         // Per usual.
         
 
-        $soql = sprintf("SELECT Id, Name, ClickpdxCatalog__HtmlDescription__c FROM Product2 WHERE Id IN (%s)", $step2);
+        $soql = sprintf("SELECT Id, Name, Description, ClickpdxCatalog__HtmlDescription__c FROM Product2 WHERE Id IN (%s)", $step2);
 
         $result = $api->query($soql);
 
 
         $products = $result->getRecords();
 
-        $desc = array_map(function($product) {
+        /*$desc = array_map(function($product) {
             $html = $product['ClickpdxCatalog__HtmlDescription__c'];
             $standard = $product["Description"];
 
@@ -64,12 +64,17 @@ class SearchResultProducts{
             return empty($html) ? $standard : $html;
         }, $products);
 
-        var_dump($desc);
+        var_dump($desc);*/
     
-        $qlsnippets = sprintf("CALL SNIPPETS(('%s'), 'ocdla_products', '%s', 10 AS around, 300 AS limit, 1 AS query_mode, 'strip' AS html_strip_mode, '<mark class=\"result\">' AS before_match, '</mark>' AS after_match)",implode("','",$desc),$terms);
+        self::getCallSnippets($products, "ocdla_products", $terms);
+        $sqlsnippets = self::$query;
+        //print($sqlsnippets);
+        //exit;
+        
 
-        $snippets = mysqli_query($conn, $qlsnippets);
-        var_dump($snippets);
+        $snippets = mysqli_query($conn, $sqlsnippets);
+        //var_dump($snippets);
+        //exit;
 
 
         

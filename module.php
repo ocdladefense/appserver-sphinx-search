@@ -109,7 +109,7 @@ class SphinxModule extends Module {
 
         //@@relaxed
 
-        $indexes = "wiki_main, ocdla_products";
+        $indexes = "ocdla_products, wiki_main";
 
         $ql = "SELECT * FROM %s WHERE MATCH('%s')";
   
@@ -128,8 +128,7 @@ class SphinxModule extends Module {
         //exit;
 
         //Holds doc ids for products
-        $prodIds = array();
-        $wikiIds = array();
+        $queueOrder = array();
 
         //$snippetBuilder = new SearchResultProducts($conn);
 
@@ -141,6 +140,7 @@ class SphinxModule extends Module {
         while($row = mysqli_fetch_assoc($result)) {
             $myClass = $registered[$row["indexname"]];
             //var_dump($myClass);
+            $queueOrder[] = $myClass;
             $myClass::addResult($row["alt_id"]);
             //var_dump($name);
             //$productIds[] = $row["product_id"];
@@ -157,9 +157,16 @@ class SphinxModule extends Module {
             $myClass = $registered[$snippetIndex];
             $myClass::buildSnippets($terms, $conn, $api);
         }
-        exit;
+        //exit;
+        $html = array();
+        foreach($queueOrder as $queue) {
+            $myClass = $queue;
+            //var_dump($myClass);
+            $html[] = $myClass::dequeue();
+        }
 
-
+        //var_dump($html);
+        //exit;
         /*
         
         while($row = mysqli_fetch_assoc($result))
