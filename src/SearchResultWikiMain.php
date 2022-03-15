@@ -7,7 +7,7 @@ class SearchResultWikiMain extends SearchResultBase{
 
     public function __construct()
     {
-      
+      $this->indexName = "wiki_main";
     }
 
     public static function addResult($r)
@@ -42,20 +42,16 @@ class SearchResultWikiMain extends SearchResultBase{
         $step1 = array_map($fn, self::$ids);
         $docIds = implode( ",", $step1);
         $query = "SELECT page_id, 'wiki_main' AS indexname, page_title, page_namespace, page_is_redirect, old_id, old_text FROM page, revision, text WHERE rev_id=page_latest AND old_id=rev_text_id AND page_id IN ($docIds)";
-        //$results = $db->select($query);
-        //$queryTest = "SELECT page_id, 'wiki_main' AS indexname, page_title, page_namespace, page_is_redirect, old_id, old_text FROM page, revision, text WHERE rev_id=page_latest AND old_id=rev_text_id AND page_id IN ('4001')";
+
+        //Returns DbSelectResult
         $resultTest = $db->select($query);
         $blogs = $resultTest->getIterator();
-        //var_dump($resultTest);
-        //exit;
+        $data = $resultTest->getValues("old_text");
         
-        //$qlsnippets = sprintf("CALL SNIPPETS(('%s'), 'wiki_main', '%s', 10 AS around, 300 AS limit, 'strip' AS html_strip_mode)", implode("','", $step1), $terms);
-        //var_dump($qlsnippets);
-        self::getCallSnippets($blogs, "wiki_main", $terms);
-        $qlsnippets = self::$query;
+
+        $qlsnippets = self::getCallSnippets($data, "wiki_main", $terms);
         $snippets = mysqli_query($conn, $qlsnippets);
-        //var_dump($snippets);
-        //exit;
+
 
         $counter = 0;
         while($row = mysqli_fetch_assoc($snippets)){
@@ -72,9 +68,6 @@ class SearchResultWikiMain extends SearchResultBase{
 
             $counter++;
         }
-
-        //var_dump(self::$results);
-        //exit;
     }
     
 }

@@ -115,22 +115,10 @@ class SphinxModule extends Module {
   
         $query = sprintf($ql,$indexes, $terms);
 
-        //$ql2 = " WHERE MATCH('%s') ORDER BY indexname ASC";
-
-        //$query .= sprintf($ql2,$terms);
-
-        //print($query);
-        //exit;
-
         $result = mysqli_query($conn, $query);
 
-        //var_dump($result);
-        //exit;
-
-        //Holds doc ids for products
+        //Maintains the order of the class calls to dequeue later
         $queueOrder = array();
-
-        //$snippetBuilder = new SearchResultProducts($conn);
 
         $registered = array(
             "ocdla_products" => "SearchResultProducts",
@@ -139,16 +127,9 @@ class SphinxModule extends Module {
         // Iterate through the query results.
         while($row = mysqli_fetch_assoc($result)) {
             $myClass = $registered[$row["indexname"]];
-            //var_dump($myClass);
             $queueOrder[] = $myClass;
             $myClass::addResult($row["alt_id"]);
-            //var_dump($name);
-            //$productIds[] = $row["product_id"];
-            //var_dump($row);
         }
-
-        //$class = new SearchResultWikiMain();
-        //$class->buildSnippets($terms, $conn);
         
 
         $snippetIndexes = explode(", ", $indexes);
@@ -157,103 +138,12 @@ class SphinxModule extends Module {
             $myClass = $registered[$snippetIndex];
             $myClass::buildSnippets($terms, $conn, $api);
         }
-        //exit;
+        
         $html = array();
         foreach($queueOrder as $queue) {
             $myClass = $queue;
-            //var_dump($myClass);
             $html[] = $myClass::dequeue();
         }
-
-        //var_dump($html);
-        //exit;
-        /*
-        
-        while($row = mysqli_fetch_assoc($result))
-        {
-            $productIds[] = $row["product_id"];
-            //var_dump($row);
-        }
-        //exit;
-
-
-        if(count($productIds) < 1) {
-            return "No results found.";
-        }
-
-        // Our list of proudct IDs.
-
-
-        $fn = function($id){return "'{$id}'";};
-
-        $step1 = array_map($fn, $productIds);
-
-
-        $step2 = implode(",", $step1);
-
-
-        // Per usual.
-        
-
-        $soql = sprintf("SELECT Id, Name, ClickpdxCatalog__HtmlDescription__c FROM Product2 WHERE Id IN (%s)", $step2);
-
-
-
-
-        
-        //$builder = DatabaseUtils::parse("SELECT Id, Name, Description FROM Product2 WHERE Id = '%s'", $productIds);
-
-        //select * from product2 where id in ('123', '124')
-
-        //var_dump($builder);exit;
-
-
-        // How will we get this to work when needing to pass an array of Product IDs in?
-        $result = $api->query($soql);
-
-
-        $products = $result->getRecords();
-
-        
-        // var_dump($products);exit;
- 
-
-        $desc = array_map(function($product) {
-            $html = $product['ClickpdxCatalog__HtmlDescription__c'];
-            $standard = $product["Description"];
-
-            $html = utf8_decode($html);
-            $html = preg_replace('/\x{00A0}+/mis', " ", $html);
-            
-            return empty($html) ? $standard : $html;
-        }, $products);
-
-
-    
-        $qlsnippets = sprintf("CALL SNIPPETS(('%s'), 'ocdla_products', '%s', 10 AS around, 300 AS limit, 1 AS query_mode, 'strip' AS html_strip_mode, '<mark class=\"result\">' AS before_match, '</mark>' AS after_match)",implode("','",$desc),$terms);
-
-        $snippets = mysqli_query($conn, $qlsnippets);
-        
-
-        
-        $counter = 0;
-        while($row = mysqli_fetch_assoc($snippets)) {
-        
-            $snippet = $row["snippet"];
-
-            //Each type of search result will have its own class.
-            
-            $snippet = str_replace('&nbsp;', ' ', $snippet);
-            $snippet = '<div style="line-height:15px;">'.$snippet."</div>";
-            $product = $products[$counter];
-            
-            $shoplink = "{$domain}/OcdlaProduct?id={$product['Id']}";
-            $name = "<h2 style='font-size:12pt;'><a href='{$shoplink}' target='_blank'>{$product['Name']}</a></h2>";
-            
-            $html[] = '<div class="search-result" style="margin-bottom:14px;">'.$name.$snippet.'</div>';
-
-            $counter++;
-        }*/
         
         $title = "<h2 class='summary'>Showing results for <i>{$terms}</i></h2>";
         $tpl = new Template("widget");

@@ -29,19 +29,12 @@ class SearchResultProducts extends SearchResultBase{
 
     public static function buildSnippets($terms, $conn, $api)
     {
-
-        //var_dump(self::$ids);
-
         $fn = function($id){return "'{$id}'";};
 
         $step1 = array_map($fn, self::$ids);
 
 
         $step2 = implode(",", $step1);
-      
-
-
-        //var_dump($step);
 
 
         // Per usual.
@@ -54,7 +47,7 @@ class SearchResultProducts extends SearchResultBase{
 
         $products = $result->getRecords();
 
-        /*$desc = array_map(function($product) {
+        $desc = array_map(function($product) {
             $html = $product['ClickpdxCatalog__HtmlDescription__c'];
             $standard = $product["Description"];
 
@@ -64,20 +57,11 @@ class SearchResultProducts extends SearchResultBase{
             return empty($html) ? $standard : $html;
         }, $products);
 
-        var_dump($desc);*/
-    
-        self::getCallSnippets($products, "ocdla_products", $terms);
-        $sqlsnippets = self::$query;
-        //print($sqlsnippets);
-        //exit;
         
-
+        $sqlsnippets = self::getCallSnippets($desc, "ocdla_products", $terms);
+        
         $snippets = mysqli_query($conn, $sqlsnippets);
-        //var_dump($snippets);
-        //exit;
 
-
-        
         $counter = 0;
         while($row = mysqli_fetch_assoc($snippets)) {
         
@@ -92,14 +76,9 @@ class SearchResultProducts extends SearchResultBase{
             $shoplink = "{$domain}/OcdlaProduct?id={$product['Id']}";
             $name = "<h2 style='font-size:12pt;'><a href='{$shoplink}' target='_blank'>{$product['Name']}</a></h2>";
             
-            //$html[] = '<div class="search-result" style="margin-bottom:14px;">'.$name.$snippet.'</div>';
             self::enqueue('<div class="search-result" style="margin-bottom:14px;">'.$name.$snippet.'</div>');
 
             $counter++;
         }
-        //var_dump(self::$results);
-        //$value = self::dequeue();
-        //var_dump($value);
-        //exit;
     }
 }
