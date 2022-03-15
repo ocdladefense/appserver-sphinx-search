@@ -2,19 +2,15 @@
 	"name": "sphinx",
 	"description": "Perform SphinxSearch operations.",
 	"comment": "Module definition file.",
-	"files": ["DatabaseUtils.php", "SearchResultBase.php", "SearchResultProducts.php", "SearchResultWikiMain.php"],
+	"files": ["SearchResultBase.php", "SearchResultProducts.php", "SearchResultWikiMain.php"],
     "connectedApp": "default",
 	"routes": {
-        "example/search/%terms":{
-            "callback":"exampleSearch",
+        "search/%terms":{
+            "callback":"doSearch",
             "content-type":"text/html"
         },
-        "search/test":{
+        "search/%terms/test":{
             "callback":"exampleSearchTest",
-            "content-type":"text/html"
-        },
-        "example/search":{
-            "callback":"exampleSearch",
             "content-type":"text/html"
         }
     }

@@ -12,45 +12,33 @@ class SphinxModule extends Module {
 
 
     // Main callback; return a call to the SphinxQL method.
-    public function exampleSearch($terms = null) {
+    public function doSearch($terms = null) {
         if($terms == null)
         {
             $req = $this->getRequest();
             $data = $req->getBody();
-            //var_dump($data);
-            //exit;
+
             $terms = $data->term;
             if($terms == null)
             {
                 throw new exception("Search cannot be null");
             }
         }
-        return $this->exampleSearchUsingSphinxQL($terms);
+
+        return $this->searchUsingSphinxQL($terms);
     }
 
-
-    // If necessary, use the included SphinxApi client library.
-    // See ocdladefense/lib-sphinx-search for more info.
-    public function exampleSearchSphinxApi($terms) {
-
-
-
-        $cl = new SphinxClient(); // Will it work?
-
-        
-        return "Using SphinxApi client library!";
-    }
 
 
 
 
     /**
-     * @method exampleSearchUsingSphinxQL
+     * @method searchUsingSphinxQL
      * 
      * Example method to connect to a remote SphinxSearch server,
      * and return search results from a MATCH query.
      */
-    public function exampleSearchUsingSphinxQL($terms) {
+    public function searchUsingSphinxQL($terms) {
 
         // If we're experimenting then let's not bother returning the theme.
         $debug = true;
@@ -65,12 +53,6 @@ class SphinxModule extends Module {
         // Alternate port when using the included SphinxApi.php library.
         $sphinxApiPort = 9312; 
 
-        // We'll perform a secondary $api query for the actual Salesforce 
-        // products using these IDs.
-        //$productIds = array();
-
-        // $terms = "duii";
-
 
         $api = $this->loadForceApi();
 
@@ -83,18 +65,6 @@ class SphinxModule extends Module {
         // mysql -P9306 -h35.162.222.119 -protocol=tcp --prompt='sphinxQL> '"
         // $mysqli = new Mysqli("35.162.222.119:9306","","","");
 
-
-        /*
-        // PDO OPTION - We can use the PDO library when preferred.
-        $dsn = 'mysql:host=35.162.222.119;port=9306';
-
-        try {
-            $pdo = new PDO($dsn);
-            $this->isConnected = true;
-        } catch (PDOException $e) {
-            throw new Exception($e->getMessage());
-        }
-        */
 
         $conn = mysqli_connect($sphinxHost, "", "", "", $sphinxQLPort);
         if (!$conn) {
@@ -150,6 +120,22 @@ class SphinxModule extends Module {
 		$tpl->addPath(__DIR__ . "/templates");
         
         return  $tpl->render() . $title . implode("\n", $html);
+    }
+
+
+
+
+
+    // If necessary, use the included SphinxApi client library.
+    // See ocdladefense/lib-sphinx-search for more info.
+    public function exampleSearchSphinxApi($terms) {
+
+
+
+        $cl = new SphinxClient(); // Will it work?
+
+        
+        return "Using SphinxApi client library!";
     }
 
     
