@@ -8,6 +8,7 @@
         }
     },
     "require": {
-        "ocdladefense/lib-sphinx-search": "dev-development"
+        "ocdladefense/lib-sphinx-search": "dev-development",
+        "ocdladefense/lib-database": ">=2.1"
     }
 }
