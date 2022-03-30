@@ -62,7 +62,7 @@ class SearchResultProduct extends SearchResultSet {
 
 
 
-    public function getHtml()
+    public function ()
     {
         while($row = mysqli_fetch_assoc($snippets)) {
         
