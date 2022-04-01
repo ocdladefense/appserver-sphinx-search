@@ -7,11 +7,11 @@ class SphinxModule extends Module {
 
 
     private static $registered = array(
-        "ocdla_products" => "SearchResultProduct",
-        "wiki_main" => "SearchResultWiki",
-        "ocdla_members" => "SearchResultMember",
-        "ocdla_experts" => "SearchResultExpert",
-        "car" => "SearchResultCar"
+        "ocdla_products"        => "SearchResultProduct",
+        "wiki_main"             => "SearchResultWiki",
+        "ocdla_members"         => "SearchResultMember",
+        "ocdla_experts"         => "SearchResultExpert",
+        "ocdla_car"             => "SearchResultCar"
     );
 
 
@@ -67,8 +67,6 @@ class SphinxModule extends Module {
     public function searchUsingSphinxQL($terms) {
 
 
-        $domain = "https://ocdla.force.com";
-
         // Iterable so we can loop through results.
         // Register any secondary handlers.  
         // These will handle the loading of documents,
@@ -85,8 +83,8 @@ class SphinxModule extends Module {
 
         // Query the specified indexes
         // for the keywords.
-        $indexes = "ocdla_products, wiki_main";
-        $indexes = "wiki_main";
+        $indexes = "ocdla_products, ocdla_car, ocdla_members, wiki_main";
+        // $indexes = "wiki_main";
         $format = "SELECT * FROM %s WHERE MATCH('%s')";
         $query = sprintf($format, $indexes, $terms);
         $matches = $client->query($query);
@@ -97,10 +95,10 @@ class SphinxModule extends Module {
             $index = $match["indexname"];
             $id = $match["alt_id"];
 
-            $results->addResult($match);
+            $results->addMatch($match);
         }
 
-        
+        // exit;
         
         $widget = new Template("widget");
 		$widget->addPath(__DIR__ . "/templates");

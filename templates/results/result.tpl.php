@@ -11,7 +11,7 @@
 
 <div class="search-result">
     <h2 style='font-size:12pt;'>
-        <a href='{$url}' target='_blank'>
+        <a href='<?php print $url; ?>' target='_blank'>
             <?php print $title; ?>
         </a>
     </h2>

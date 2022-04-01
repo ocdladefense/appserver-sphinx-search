@@ -14,6 +14,12 @@ class SearchResult
     public $snippet = null;
 
 
+    public $url = null;
+
+    
+    public $id = null;
+
+
     const DEBUG = true;
 
 
@@ -24,6 +30,14 @@ class SearchResult
 
     public function setSnippet($snippet) {
         $this->snippet = $snippet;
+    }
+
+    public function setUrl($url) {
+        $this->url = $url;
+    }
+
+    public function setId($id) {
+        $this->id = $id;
     }
 
 

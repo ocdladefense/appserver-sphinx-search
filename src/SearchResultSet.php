@@ -3,6 +3,9 @@
 
 class SearchResultSet implements \IteratorAggregate {
 
+    // Internal array of matches returned
+    // by the search engine.
+    private $matches = array();
 
     private static $docIds = array();
 
@@ -23,9 +26,12 @@ class SearchResultSet implements \IteratorAggregate {
     private $isInitialized = null;
     
 
-    public function addResult($result)
+    public function addMatch($result)
     {
-         $this->results []= $result;
+        $id = $result["id"];
+        $index = $result["indexname"];
+
+        $this->matches[$id]= $result;
     }
 
     public function register($map) {
@@ -45,23 +51,20 @@ class SearchResultSet implements \IteratorAggregate {
 
         // Delegate to the appropriate registered
         // result classes.
-        $types = array_map(function($result) { return $result["indexname"]; }, $this->results);
+        $types = array_map(function($result) { return $result["indexname"]; }, $this->matches);
         $types = array_unique($types);
 
-        $handlers = $this->handlers;
-
-        array_walk($types, function($type) use($handlers) { 
+        array_walk($types, function($type) { 
             $class = self::$registered[$type];
             $this->handlers[$type] = new $class();
         }, $types);
-
-        
 
         $this->isInitialized = true;
     }
 
 
-    public function setResult($index, $docId, $result) {
+    public function addResult($index, $docId, $result) {
+
         $handler = $this->handlers[$index];
 
         $handler->addResult($docId, $result);
@@ -96,14 +99,22 @@ class SearchResultSet implements \IteratorAggregate {
 
         // then load the documents for each class;
 
-
+        $domain = "https://ocdla.force.com";
         // then get the snippets
 
-        $results = [
-            new SearchResult("Title 1", "Snippet 1"),
-            new SearchResult("Title 2", "Snippet 2")
-        ];
+        foreach($this->matches as $match) {
+            // Load the documents
+            $indexname = $match["indexname"];
+        }
 
+        return (function () {
+            $domain = "https://ocdla.my.salesforce.com";
+            while($match = next($this->matches)) {
+                $result = new SearchResult($match["alt_id"],$match["indexname"]);
+                $result->setUrl($domain . "/" . $match["alt_id"]);
+                yield $result;
+            }
+        })();
 
         return new \ArrayObject($results);
     }
