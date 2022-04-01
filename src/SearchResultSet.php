@@ -127,8 +127,8 @@ class SearchResultSet implements \IteratorAggregate {
             
                 $index = $match["indexname"];
                 $handler = $this->handlers[$index] ?? $this;
-
-                $result = $handler->newResult($match["id"],$match["indexname"],$match["alt_id"]);
+                
+                $result = $handler->newResult($match["id"]);
                 
                 yield $result;
             }
@@ -138,11 +138,14 @@ class SearchResultSet implements \IteratorAggregate {
     }
 
 
-    private function newResult($title, $snippet, $url) {
+    protected function newResult($docId) {
+        $match = self::$matches[$docId];
+        $index = $match["indexname"];
+        $altId = $match["alt_id"];
         $domain = "https://ocdla.force.com";
         $domain = "https://ocdla.my.salesforce.com";
-        $url = $domain . "/" . $url;
-        return new SearchResult($title,$snippet,$url);
+        $url = $domain . "/" . $altId;
+        return new SearchResult($altId,$snippet,$url);
     }
 
 

@@ -7,6 +7,8 @@ use Mysql\Database;
 class SearchResultWiki extends SearchResultSet {
     
 
+    private $template = "wiki";
+
 
     public function __construct()
     {
@@ -55,11 +57,16 @@ class SearchResultWiki extends SearchResultSet {
 
 
 
-    public function getResult($docId) {
-        $snippet = substr($this->documents[$docId]["old_text"],0,255);
-        $title = $this->documents[$docId]["page_title"];
+    public function newResult($docId) {
+        $altId = $this->results[$docId];       
+        $title = "Wiki Title - $altId"; //$this->documents[$docId]["page_title"];
+        $snippet = "Wiki Snippet - $altId"; //substr($this->documents[$docId]["old_text"],0,255);
+        
 
-        return new SearchResult($title,$snippet);
+        $result = new SearchResult($title,$snippet,"https://lod.ocdla.org/index.php?curid={$altId}");
+        $result->setTemplate("wiki");
+
+        return $result;
     }
     
 }

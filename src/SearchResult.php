@@ -14,6 +14,9 @@ class SearchResult
     public $snippet = null;
 
 
+    private $template = "result";
+
+
     public $url = null;
 
     
@@ -40,6 +43,10 @@ class SearchResult
         $this->id = $id;
     }
 
+    public function setTemplate($tpl) {
+        $this->template = $tpl;
+    }
+
 
     public function __construct($title, $snippet = null, $url = null) {
         $this->title = $title;
@@ -54,7 +61,7 @@ class SearchResult
      * Render this search result instance into HTML using the
      * specified template.  Default template is result.tpl.php.
      */
-    public function toHtml($template = "result", $params = array()) {
+    public function toHtml($params = array()) {
 
 		
 
@@ -74,8 +81,8 @@ class SearchResult
         }
         $directory = dirname($reflection->getFileName());
 
-        $path = $directory . "/../templates/results/" . $template . ".tpl.php";
-        $path = BASE_PATH . "/modules/sphinx/templates/results/" . $template . ".tpl.php";
+        $path = $directory . "/../templates/results/" . $this->template . ".tpl.php";
+        $path = BASE_PATH . "/modules/sphinx/templates/results/" . $this->template . ".tpl.php";
         // print $path;
         if(self::DEBUG === true && !is_readable($path)) {
             throw new \ComponentException("PATH_RESOLUTION_ERROR: The file does not exist or is not readable: {$path}.");
