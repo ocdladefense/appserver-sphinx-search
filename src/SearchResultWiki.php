@@ -25,42 +25,41 @@ class SearchResultWiki extends SearchResultSet {
 
         Database::setDefault($params);
 
+        $page_ids = array();
 
-
+        foreach(self::$matches as $id => $match) {
+            $index = $match["indexname"];
+            if("wiki_main" == $index) $page_ids []= $match["alt_id"];
+        }
 
         $db = new Mysql\Database();
 
+
+
         $fn = function($id){return "'{$id}'";};
-        $step1 = array_map($fn, self::$ids);
+        $step1 = array_map($fn, $page_ids);
         $docIds = implode( ",", $step1);
-        $query = "SELECT page_id, 'wiki_main' AS indexname, page_title, page_namespace, page_is_redirect, old_id, old_text FROM page, revision, text WHERE rev_id=page_latest AND old_id=rev_text_id AND page_id IN ($docIds)";
+        $query = "SELECT page_id, page_title, page_namespace, page_is_redirect, old_id, old_text FROM page, revision, text WHERE rev_id=page_latest AND old_id=rev_text_id AND page_id IN ($docIds)";
 
         //Returns DbSelectResult
-        $resultTest = $db->select($query);
-        $blogs = $resultTest->getIterator();
-        $data = $resultTest->getValues("old_text");
+        $records = $db->select($query);
+       
+       
+        foreach($records as $record) {
+            $alt_id = $record["page_id"];
+            $match = $this->getMatch("alt_id", $alt_id)[0];
+            $id = $match["id"];
+            $this->documents[$id] = $record;
+        }
     }
 
 
 
-    public function getSearchResult() {
-        $counter = 0;
+    public function getResult($docId) {
+        $snippet = substr($this->documents[$docId]["old_text"],0,255);
+        $title = $this->documents[$docId]["page_title"];
 
-
-        while($row = mysqli_fetch_assoc($snippets)){
-            $snippet = $row["snippet"];
-
-            $snippet = str_replace('&nbsp;', ' ', $snippet);
-            $snippet = '<div style="line-height:15px;">'.$snippet."</div>";
-            $blog = $blogs[$counter];
-
-            $link = "https://libraryofdefense.ocdla.org/{$blog['page_title']}";
-            $name = "<h2 style='font-size:12pt;'><a href='{$link}' target='_blank'>{$blog['page_title']}</a></h2>";
-
-            self::enqueue('<div class="search-result" style="margin-bottom:14px;">'.$name.$snippet.'</div>');
-
-            $counter++;
-        }
+        return new SearchResult($title,$snippet);
     }
     
 }

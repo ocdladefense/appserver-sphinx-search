@@ -41,9 +41,10 @@ class SearchResult
     }
 
 
-    public function __construct($title,$snippet = null) {
+    public function __construct($title, $snippet = null, $url = null) {
         $this->title = $title;
         $this->snippet = $snippet;
+        $this->url = $url;
     }
 
 

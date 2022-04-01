@@ -3,35 +3,61 @@
 
 class SearchResultSet implements \IteratorAggregate {
 
+    // @var handlers
+    // Handlers are really additional ResultSet
+    // instances.  We can delelagate document loading
+    // and snippet loading to these subclasses.
+    protected static $handlers = array();
+
     // Internal array of matches returned
-    // by the search engine.
-    private $matches = array();
+    // by the search engine.  These matches might span
+    // several different repositories.  The current version
+    // returns an "indexname" key that specifies which index the result
+    // was returned from.
+    protected static $matches = array();
 
-    private static $docIds = array();
-
-    private static $documents = array();
-
-    private static $snippets = array();
-
-    private static $terms = array();
-
-    protected static $ids = array();
-
-    protected static $results = array();
-
+    // @var index
+    // Specific index for which this class is a handler for.
     protected $index = null;
 
-    protected $handlers = array();
+    // @var documents
+    // Instance variable populated after
+    // querying for the original documents.
+    protected $documents = array();
+
+    // @var snippets
+    // 
+    protected $snippets = array();
+
+    // @var terms
+    protected static $terms = array();
+
+    // @var results
+    // Store matches/results for a specific index.
+    protected $results = array();
+
+    protected static $registered = array(
+        "wiki_main" => "SearchResultWiki",
+        "ocdla_products" => "SearchResultProduct",
+        "ocdla_members" => "SearchResultProduct"
+    );
 
     private $isInitialized = null;
     
+
+
+
+
+    public function getMatch($prop = "alt_id", $altId) {
+        return array_filter(self::$matches, function($match) use($altId,$prop){ return $match[$prop] == $altId; });
+    }
 
     public function addMatch($result)
     {
         $id = $result["id"];
         $index = $result["indexname"];
 
-        $this->matches[$id]= $result;
+        self::$matches[$id]= $result;
     }
 
     public function register($map) {
@@ -41,8 +67,7 @@ class SearchResultSet implements \IteratorAggregate {
 
     public static function buildSnippets()
     {   
-        $index = "wiki_main";
-        $qlsnippets = SphinxQL::call("snippets", $docs, "wiki_main", $terms);
+        $qlsnippets = SphinxQL::call("snippets", $docs, $this->index, $terms);
         $snippets = mysqli_query($conn, $qlsnippets);
     }   
 
@@ -51,72 +76,73 @@ class SearchResultSet implements \IteratorAggregate {
 
         // Delegate to the appropriate registered
         // result classes.
-        $types = array_map(function($result) { return $result["indexname"]; }, $this->matches);
-        $types = array_unique($types);
+        $indexes = array_map(function($match) { return $match["indexname"]; }, self::$matches);
+        $indexes = array_unique($indexes);
 
-        array_walk($types, function($type) { 
-            $class = self::$registered[$type];
-            $this->handlers[$type] = new $class();
-        }, $types);
+        array_walk($indexes, function($index) { 
+            $class = self::$registered[$index];
+            $this->handlers[$index] = new $class();
+        });
+
+
+        array_walk(self::$matches, function($match) {
+            $index = $match["indexname"];
+            $docId = $match["id"];
+            $handler = $this->handlers[$index];
+            $handler->addResult($docId,$match);
+        });
+
 
         $this->isInitialized = true;
     }
 
 
-    public function addResult($index, $docId, $result) {
-
-        $handler = $this->handlers[$index];
-
-        $handler->addResult($docId, $result);
+    // Add a handler-specific result.
+    // Keyed by Sphinx document id, value is the alt_id for accessing
+    // the original document.
+    public function addResult($docId, $match) {
+        $this->results[$docId] = $match["alt_id"];
     }
 
 
     public function getResult($docId) {
-        $result = $this->results[$docId];
-
-        $handler = $this->handlers[$result["indexname"]];
-
+        return $this->results[$docId];
     }
+
+
 
     // This statement is executed when
     // we call our foreach() loop.
     public function getIterator()
     {
-        /*
+        
         if(!$this->isInitialized) {
             $this->init();
         }
 
-        foreach($this->results as $result) {
-            $docId = $result["id"];
-            $handler = $result["indexname"];
-            
-            $this->addResult($handler, $docId, $result);
-        }
-        */
-
-        // var_dump($types);
-
-        // then load the documents for each class;
-
-        $domain = "https://ocdla.force.com";
-        // then get the snippets
-
-        foreach($this->matches as $match) {
-            // Load the documents
-            $indexname = $match["indexname"];
-        }
 
         return (function () {
-            $domain = "https://ocdla.my.salesforce.com";
-            while($match = next($this->matches)) {
-                $result = new SearchResult($match["alt_id"],$match["indexname"]);
-                $result->setUrl($domain . "/" . $match["alt_id"]);
+            
+            while($match = next(self::$matches)) {
+            
+                $index = $match["indexname"];
+                $handler = $this->handlers[$index] ?? $this;
+
+                $result = $handler->newResult($match["id"],$match["indexname"],$match["alt_id"]);
+                
                 yield $result;
             }
         })();
 
-        return new \ArrayObject($results);
+        // return new \ArrayObject($results);
+    }
+
+
+    private function newResult($title, $snippet, $url) {
+        $domain = "https://ocdla.force.com";
+        $domain = "https://ocdla.my.salesforce.com";
+        $url = $domain . "/" . $url;
+        return new SearchResult($title,$snippet,$url);
     }
 
 
