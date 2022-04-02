@@ -78,20 +78,20 @@ class SearchResultSet implements \IteratorAggregate {
         // result classes.
         $indexes = array_map(function($match) { return $match["indexname"]; }, self::$matches);
         $indexes = array_unique($indexes);
-
+        
         array_walk($indexes, function($index) { 
             $class = self::$registered[$index];
-            $this->handlers[$index] = new $class();
+            self::$handlers[$index] = new $class();
         });
 
-
+        /*
         array_walk(self::$matches, function($match) {
             $index = $match["indexname"];
             $docId = $match["id"];
-            $handler = $this->handlers[$index];
+            $handler = self::$handlers[$index];
             $handler->addResult($docId,$match);
         });
-
+        */
 
         $this->isInitialized = true;
     }
@@ -109,6 +109,10 @@ class SearchResultSet implements \IteratorAggregate {
         return $this->results[$docId];
     }
 
+    public function getResults() {
+        return $this->results;
+    }
+
 
 
     // This statement is executed when
@@ -120,15 +124,22 @@ class SearchResultSet implements \IteratorAggregate {
             $this->init();
         }
 
+        $handler = self::$handlers["wiki_main"];
+        $altIds = $handler->getDocumentIds();
+        $handler->loadDocuments($altIds);
+
+        $handler = self::$handlers["ocdla_products"];
+        $altIds = $handler->getDocumentIds();
+        $handler->loadDocuments($altIds);
 
         return (function () {
             
             while($match = next(self::$matches)) {
             
                 $index = $match["indexname"];
-                $handler = $this->handlers[$index] ?? $this;
+                $handler = self::$handlers[$index] ?? $this;
                 
-                $result = $handler->newResult($match["id"]);
+                $result = $handler->newResult($match["alt_id"]);
                 
                 yield $result;
             }

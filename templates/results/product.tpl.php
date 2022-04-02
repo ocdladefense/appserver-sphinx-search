@@ -1,6 +1,6 @@
 <?php
 /**
- * Template file for rendering a Product search result.
+ * Template file for rendering a Wiki search result.
  * 
  * Available variables:
  *  $title The name of the Product.
@@ -8,23 +8,13 @@
  *  $url A link to the document source.
  */
 ?>
-
-<h2 style='font-size:12pt;'>
-    <a href='{$shoplink}' target='_blank'>
-        <?php print $title; ?>
-    </a>
-</h2>
-
-
-
-<?php
- /*
-$snippet = str_replace('&nbsp;', ' ', $snippet);
-$snippet = '<div style="line-height:15px;">'.$snippet."</div>";
-$name = "<h2 style='font-size:12pt;'><a href='{$shoplink}' target='_blank'>{$product['Name']}</a></h2>";
-
-self::enqueue('<div class="search-result" style="margin-bottom:14px;">'.$name.$snippet.'</div>');
-
-
-
-*/
+<div class="search-result search-result-product" style="margin-top:15px; padding-top:10px;border-top:1px solid #ccc;">
+    <h2 style='font-size:12pt;'>
+        <a href='<?php print $url; ?>' target='_blank'>
+            <?php print $title; ?>
+        </a>
+    </h2>
+    <div class="snippet">
+        <?php print $snippet; ?>
+    </div>
+</div>

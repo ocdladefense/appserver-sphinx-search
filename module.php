@@ -90,13 +90,22 @@ class SphinxModule extends Module {
 
 
         while($match = mysqli_fetch_assoc($matches)) {
-            // var_dump($match);
+            //var_dump($match);
             $index = $match["indexname"];
             $alt_id = $match["alt_id"];
             $id = $match["id"];
 
             $results->addMatch($match);
         }
+
+        // exit;
+
+        // Testing code to see if the delegate classes 
+        // can actually load documents.
+        // $set = new SearchResultWiki();
+        // $set->loadDocuments(5442);
+        // var_dump($set->getResults());
+        // exit;
 
         
         

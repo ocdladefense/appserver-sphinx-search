@@ -6,15 +6,15 @@
  * to retrieve the original Product names and descriptions for rendering
  * the actual search results to the user.
  */
+use Mysql\DbHelper;
 
 
+class SearchResultProduct extends SearchResultSet implements ISnippet {
 
-class SearchResultProduct extends SearchResultSet {
-
-    const docQuery = "SELECT Id, Name, Description, ClickpdxCatalog__HtmlDescription__c FROM Product2 WHERE Id IN (%s)";
+    private static $query = "SELECT Id, Name, Description, ClickpdxCatalog__HtmlDescription__c FROM Product2 WHERE Id IN (%s)";
 
 
-    
+    private $template = "product";
 
 
 
@@ -24,28 +24,39 @@ class SearchResultProduct extends SearchResultSet {
     }
 
 
-    protected function loadDocuments()
+
+    public function getDocumentIds() {
+
+        foreach(self::$matches as $id => $match) {
+            $index = $match["indexname"];
+            $altId = $match["alt_id"];
+            if("ocdla_products" == $index) $this->results[$altId] = $match;
+        }
+
+
+        // Returns DbSelectResult
+        return array_keys($this->results);
+    }
+
+
+
+
+    public function loadDocuments($productIds)
     {
+        $api = loadApi();
 
 
-        $fn = function($id){return "'{$id}'";};
-
-        $step1 = array_map($fn, self::$ids);
-
-
-        $step2 = implode(",", $step1);
-
-
-        // Per usual.
-        
-
-        $soql = sprintf(self::docQuery, $step2);
+        $soql = DbHelper::parseArray(self::$query, $productIds);
 
         $result = $api->query($soql);
 
-
         $products = $result->getRecords();
 
+        foreach($products as $product) {
+            $this->results[$product["Id"]] = $product;
+        }
+
+        /*
         $desc = array_map(function($product) {
             $html = $product['ClickpdxCatalog__HtmlDescription__c'];
             $standard = $product["Description"];
@@ -55,6 +66,7 @@ class SearchResultProduct extends SearchResultSet {
             
             return empty($html) ? $standard : $html;
         }, $products);
+        */
     }
 
 
@@ -62,19 +74,15 @@ class SearchResultProduct extends SearchResultSet {
 
 
 
-    public function next()
-    {
-        while($row = mysqli_fetch_assoc($snippets)) {
-        
-            $product = $products[$counter];
+    public function newResult($docId) {
+        $result = $this->results[$docId];       
+        $title = $result["Name"];
+        $snippet = $result["ClickpdxCatalog__HtmlDescription__c"];
+        $domain = "https://ocdla.force.com";
+        $result = new SearchResult($title,$snippet,"{$domain}/OcdlaProduct?id={$docId}");
+        $result->setTemplate("product");
 
-            $snippet = $row["snippet"];
-            $url = "{$domain}/OcdlaProduct?id={$row['alt_id']}";
-            //Each type of search result will have its own class.
-            
-
-
-            $counter++;
-        }
+        return $result;
     }
+       
 }

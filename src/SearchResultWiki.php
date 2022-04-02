@@ -4,10 +4,17 @@
 use Mysql\Database;
 
 
-class SearchResultWiki extends SearchResultSet {
+class SearchResultWiki extends SearchResultSet implements ISnippet {
     
-
+    // Which template file should be used to render results
+    // for this index.
     private $template = "wiki";
+
+
+    // Query where to retrieve the original
+    // Document source; used for displaying snippets.
+    private static $query = "SELECT page_id, page_title, page_namespace, page_is_redirect, old_id, old_text FROM page, revision, text WHERE rev_id=page_latest AND old_id=rev_text_id AND page_id IN (:array)";
+
 
 
     public function __construct()
@@ -15,7 +22,24 @@ class SearchResultWiki extends SearchResultSet {
       $this->index = "wiki_main";
     }
 
-    public function loadDocuments() {
+
+
+    public function getDocumentIds() {
+
+        foreach(self::$matches as $id => $match) {
+            $index = $match["indexname"];
+            $altId = $match["alt_id"];
+            if("wiki_main" == $index) $this->results[$altId] = $match;
+        }
+
+
+        // Returns DbSelectResult
+        return array_keys($this->results);
+    }
+    
+
+    public function loadDocuments($pageIds) {
+        $pageIds = is_array($pageIds) ? $pageIds : array($pageIds);
 
         $params = array(
             "host" => "172.31.47.173",
@@ -26,47 +50,31 @@ class SearchResultWiki extends SearchResultSet {
 
 
         Database::setDefault($params);
-
-        $page_ids = array();
-
-        foreach(self::$matches as $id => $match) {
-            $index = $match["indexname"];
-            if("wiki_main" == $index) $page_ids []= $match["alt_id"];
-        }
-
         $db = new Mysql\Database();
-
-
-
-        $fn = function($id){return "'{$id}'";};
-        $step1 = array_map($fn, $page_ids);
-        $docIds = implode( ",", $step1);
-        $query = "SELECT page_id, page_title, page_namespace, page_is_redirect, old_id, old_text FROM page, revision, text WHERE rev_id=page_latest AND old_id=rev_text_id AND page_id IN ($docIds)";
-
-        //Returns DbSelectResult
-        $records = $db->select($query);
-       
+        
+        $records = $db->select(self::$query,$pageIds);
+        
        
         foreach($records as $record) {
-            $alt_id = $record["page_id"];
-            $match = $this->getMatch("alt_id", $alt_id)[0];
-            $id = $match["id"];
-            $this->documents[$id] = $record;
+            $altId = $record["page_id"];
+            $this->results[$altId] = $record;
         }
     }
 
 
 
     public function newResult($docId) {
-        $altId = $this->results[$docId];       
-        $title = "Wiki Title - $altId"; //$this->documents[$docId]["page_title"];
-        $snippet = "Wiki Snippet - $altId"; //substr($this->documents[$docId]["old_text"],0,255);
-        
+        $result = $this->results[$docId];       
+        $title = $result["page_title"];
+        $snippet = substr($result["old_text"],0,255);
 
-        $result = new SearchResult($title,$snippet,"https://lod.ocdla.org/index.php?curid={$altId}");
+        $result = new SearchResult($title,$snippet,"https://lod.ocdla.org/index.php?curid={$docId}");
         $result->setTemplate("wiki");
 
         return $result;
     }
+        
+        
+
     
 }
