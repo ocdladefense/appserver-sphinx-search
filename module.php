@@ -72,7 +72,7 @@ class SphinxModule extends Module {
         // These will handle the loading of documents,
         // and any optional snippet generation.
         $results = new SearchResultSet();
-        $results->register(self::$registered);
+        
 
         
         // Instantial a new SphinxQL client
@@ -90,7 +90,7 @@ class SphinxModule extends Module {
 
 
         while($match = mysqli_fetch_assoc($matches)) {
-            //var_dump($match);
+            // var_dump($match);
             $index = $match["indexname"];
             $alt_id = $match["alt_id"];
             $id = $match["id"];
@@ -117,8 +117,8 @@ class SphinxModule extends Module {
         $list = $page->render(
             array(
                 "widget"    => $widget->render(),
-                "results"   => $results,
-                "terms"     => $terms
+                "terms"     => $terms,
+                "results"   => $results
             )
         );
 

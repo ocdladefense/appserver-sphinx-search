@@ -55,7 +55,10 @@ class SearchResultProduct extends SearchResultSet implements ISnippet {
         foreach($products as $product) {
             $this->results[$product["Id"]] = $product;
         }
+        // var_dump($this->results);exit;
 
+        // We'll see if we need to incorporate this, below.
+        // For now leave it commented.
         /*
         $desc = array_map(function($product) {
             $html = $product['ClickpdxCatalog__HtmlDescription__c'];
@@ -75,11 +78,12 @@ class SearchResultProduct extends SearchResultSet implements ISnippet {
 
 
     public function newResult($docId) {
-        $result = $this->results[$docId];       
-        $title = $result["Name"];
-        $snippet = $result["ClickpdxCatalog__HtmlDescription__c"];
-        $domain = "https://ocdla.force.com";
-        $result = new SearchResult($title,$snippet,"{$domain}/OcdlaProduct?id={$docId}");
+        $result     = $this->results[$docId];       
+        $title      = $result["Name"];
+        $snippet    = substr(strip_tags($result["ClickpdxCatalog__HtmlDescription__c"]),0,255);
+
+        $domain     = "https://ocdla.force.com";
+        $result     = new SearchResult($title,$snippet,"{$domain}/OcdlaProduct?id={$docId}");
         $result->setTemplate("product");
 
         return $result;

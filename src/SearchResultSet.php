@@ -39,7 +39,7 @@ class SearchResultSet implements \IteratorAggregate {
     protected static $registered = array(
         "wiki_main" => "SearchResultWiki",
         "ocdla_products" => "SearchResultProduct",
-        "ocdla_members" => "SearchResultProduct"
+        "ocdla_members" => "SearchResultMember"
     );
 
     private $isInitialized = null;
@@ -60,9 +60,7 @@ class SearchResultSet implements \IteratorAggregate {
         self::$matches[$id]= $result;
     }
 
-    public function register($map) {
 
-    }
 
 
     public static function buildSnippets()
@@ -83,15 +81,6 @@ class SearchResultSet implements \IteratorAggregate {
             $class = self::$registered[$index];
             self::$handlers[$index] = new $class();
         });
-
-        /*
-        array_walk(self::$matches, function($match) {
-            $index = $match["indexname"];
-            $docId = $match["id"];
-            $handler = self::$handlers[$index];
-            $handler->addResult($docId,$match);
-        });
-        */
 
         $this->isInitialized = true;
     }
@@ -124,13 +113,11 @@ class SearchResultSet implements \IteratorAggregate {
             $this->init();
         }
 
-        $handler = self::$handlers["wiki_main"];
-        $altIds = $handler->getDocumentIds();
-        $handler->loadDocuments($altIds);
 
-        $handler = self::$handlers["ocdla_products"];
-        $altIds = $handler->getDocumentIds();
-        $handler->loadDocuments($altIds);
+        foreach(self::$handlers as $handler) {
+            $altIds = $handler->getDocumentIds();
+            $handler->loadDocuments($altIds);
+        }
 
         return (function () {
             
@@ -144,8 +131,6 @@ class SearchResultSet implements \IteratorAggregate {
                 yield $result;
             }
         })();
-
-        // return new \ArrayObject($results);
     }
 
 
