@@ -52,6 +52,8 @@ class SearchResultSet implements \IteratorAggregate {
         return array_filter(self::$matches, function($match) use($altId,$prop){ return $match[$prop] == $altId; });
     }
 
+
+
     public function addMatch($result)
     {
         $id = $result["id"];
@@ -79,7 +81,9 @@ class SearchResultSet implements \IteratorAggregate {
         
         array_walk($indexes, function($index) { 
             $class = self::$registered[$index];
-            self::$handlers[$index] = new $class();
+            if(null != $class && class_exists($class)) {
+                self::$handlers[$index] = new $class();
+            }
         });
 
         $this->isInitialized = true;
@@ -119,6 +123,18 @@ class SearchResultSet implements \IteratorAggregate {
             $handler->loadDocuments($altIds);
         }
 
+        
+        foreach(self::$matches as $id => $match) {
+            $index = $match["indexname"];
+            $altId = $match["alt_id"];
+            $class = self::$registered[$index];
+            if(null == $class || !class_exists($class)) {
+                
+                $this->results[$altId] = $match;
+            }
+        }
+        
+        
         return (function () {
             
             while($match = next(self::$matches)) {
@@ -135,13 +151,14 @@ class SearchResultSet implements \IteratorAggregate {
 
 
     protected function newResult($docId) {
-        $match = self::$matches[$docId];
+        $match = $this->results[$docId];
         $index = $match["indexname"];
         $altId = $match["alt_id"];
-        $domain = "https://ocdla.force.com";
-        $domain = "https://ocdla.my.salesforce.com";
-        $url = $domain . "/" . $altId;
-        return new SearchResult($altId,$snippet,$url);
+        $result = new SearchResult($altId,$index,$altId);
+        
+        $result->setTemplate($index);
+
+        return $result;
     }
 
 
