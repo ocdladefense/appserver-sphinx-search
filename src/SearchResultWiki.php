@@ -42,7 +42,7 @@ class SearchResultWiki extends SearchResultSet implements ISnippet {
         $pageIds = is_array($pageIds) ? $pageIds : array($pageIds);
 
         $params = array(
-            "host" => "172.31.47.173",
+            "host" => "35.162.222.119",
             "user" => "intern",
             "password" => "wEtktXd7",
             "name" => "lodwikitest"
