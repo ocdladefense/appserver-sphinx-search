@@ -47,12 +47,12 @@
         <li type="checkbox" value="ocdla.org" class="search-filter" title="Search the ocdla.org website.">ocdla.org</li>
     </ul>
 
-<form action="/example/search" method="post">
+<form action="/search" method="post">
     
     <label for="term">Search Term</label>
-    <input type="text" id="term" name="term">
-    <input type="hidden" id="repos" name="repos" value="ocdla_products, wiki_main">
+    <input type="text" id="term" name="term" />
+    <input type="hidden" id="repos" name="repos" value="ocdla_products, wiki_main" />
 
-    <input type="submit" value="Submit">
+    <input type="submit" value="Submit" />
     
 </form>
