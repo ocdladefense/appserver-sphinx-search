@@ -107,16 +107,105 @@ class SphinxModule extends Module {
         // var_dump($set->getResults());
         // exit;
 
+        $repoCheckboxes = array(
+            "People" => array(
+                "DisplayName" => "People", 
+                "IdName" => "People",
+                "RealName" => null,
+                "Render" => false,
+              "Checked" => false,
+              "Description" => "Search OCDLA members, expert witnesses, and judges."
+            ),
+            "Places" => array(
+                "DisplayName" => "Places", 
+                "IdName" => "Places",
+                "RealName" => null,
+                "Render" => false,
+              "Checked" => false,
+              "Description" => "Search cities and counties."
+            ),
+            "Library" => array(
+                "DisplayName" => "Library of Defence", 
+                "IdName" => "Library",
+                "RealName" => null,
+                "Render" => false,
+              "Checked" => false,
+              "Description" => "Search Library of Defense subject articles."
+            ),
+            "Blog" => array(
+                "DisplayName" => "Blog", 
+                "IdName" => "Blog",
+                "RealName" => null,
+                "Render" => false,
+              "Checked" => false,
+              "Description" => "Search Library of Defense blog posts."
+            ),
+            "Car" => array(
+                "DisplayName" => "Case Reviews", 
+                "IdName" => "Car",
+                "RealName" => "ocdla_products",
+                "Render" => true,
+              "Checked" => false,
+              "Description" => "Search Criminal Appellate Review summaries."
+            ),
+            "Publications" => array(
+                "DisplayName" => "Publications", 
+                "IdName" => "Publications",
+                "RealName" => null,
+                "Render" => false,
+              "Checked" => false,
+              "Description" => "Search OCDLA publications."
+            ),
+            "Products" => array(
+                "DisplayName" => "Products", 
+                "IdName" => "Products",
+                "RealName" => "ocdla_products",
+                "Render" => true,
+              "Checked" => true,
+              "Description" => "Search OCDLA products."
+            ),
+            "Videos" => array(
+                "DisplayName" => "Videos", 
+                "IdName" => "Videos",
+                "RealName" => null,
+                "Render" => false,
+              "Checked" => false,
+              "Description" => "Search video transcripts from OCDLA seminars and events."
+            ),
+            "Events" => array(
+                "DisplayName" => "Seminars & Events", 
+                "IdName" => "Events",
+                "RealName" => null,
+                "Render" => false,
+              "Checked" => false,
+              "Description" => "Search OCDLA Events."
+            ),
+            "Motions" => array(
+                "DisplayName" => "Motions", 
+                "IdName" => "Motions",
+                "RealName" => null,
+                "Render" => false,
+              "Checked" => false,
+              "Description" => "Search the legacy motion bank."
+            ),
+            "ocdla" => array(
+                "DisplayName" => "ocdla.org", 
+                "IdName" => "ocdla",
+                "RealName" => "ocdla_products",
+                "Render" => true,
+              "Checked" => false,
+              "Description" => "Search the ocdla.org website."
+            ));
         
-        
-        $widget = new Template("widget");
+        $widget = new Template("widget-checkboxes");
 		$widget->addPath(__DIR__ . "/templates");
+        $widgetHTML = $widget->render(array("repos" => $repoCheckboxes));
 
         $page = new Template("results");
         $page->addPath(__DIR__ . "/templates");
         $list = $page->render(
             array(
-                "widget"    => $widget->render(),
+                "widget"    => $widgetHTML,
                 "terms"     => $terms,
                 "results"   => $results
             )

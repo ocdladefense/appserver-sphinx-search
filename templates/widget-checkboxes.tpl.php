@@ -57,16 +57,27 @@ input[type=submit] {
 }
 
 aside {
-  width: 15%;
+  width: 20%;
+  padding-top: 15px;
+  margin-top: 0px;
   padding-left: 15px;
   margin-left: 15px;
   padding-right: 15px;
   margin-right: 15px;
-  padding-bottom: 15px;
+  padding-bottom: 25px;
   margin-bottom: 15px;
   float: left;
   font-style: italic;
   background-color: lightgray;
+  border-bottom-right-radius: 30px;
+}
+
+#submitButton {
+    background-color: rgb(163, 161, 39);
+}
+
+.search-filter {
+    color: rgb(68, 80, 146);
 }
 
 /* https://stackoverflow.com/questions/826782/how-to-disable-text-selection-highlighting */
@@ -88,17 +99,17 @@ aside {
 
 
     function toggleButtonClicked(buttonId) {
-        let button = document.getElementById(buttonId);
+        let button = document.getElementById(buttonId.id);
         button.classList.toggle("repository-selected");
-        let repos = document.getElementById("repos");
+        let localRepos = document.getElementById("repos");
 
         toggledButtons = document.querySelectorAll(".repository-selected");
 
-        repos.value = "";
+        localRepos.value = "";
         toggledButtons.forEach(button => {
-            let newRepoValue = repos.value + ' ' + button.id;
-            repos.value = newRepoValue;});
-        //console.log(repos);
+            let newRepoValue = localRepos.value + ' ' + button.id;
+            localRepos.value = newRepoValue;});
+        //console.log(buttonId.id);
         
     }
 
@@ -106,10 +117,10 @@ aside {
         let myString = document.getElementById("term").value;
 
         if ((typeof myString === 'string' || myString instanceof String) && myString != "") {
-            document.getElementById("formbase").action = "/example/search/" + myString;
+            document.getElementById("formbase").action = "/search/" + myString;
         }
         else {
-            document.getElementById("formbase").action = "/example/home/search";
+            document.getElementById("formbase").action = "/search/page";
         }
         
     }
@@ -123,9 +134,28 @@ aside {
         <label for="term">Search Term: </label>
         <input type="text" id="term" name="term">
         <input type="hidden" id="repos" name="repos" value="People, Places, Library, Blog, Case, Publications, Products, Seminars, Motions, Videos, wiki_main">
+        <div />
+
         
 
-        <input type="submit" value="Submit" style="align:center;">
+        <?php 
+        
+        foreach ($repos as $innerArray) {
+            //  Check type
+            if (is_array($innerArray)){
+                //  Scan through inner loop
+                $rep = $innerArray["IdName"];
+                if ($innerArray["Render"] == true) {
+                    echo '<input type="checkbox" id='.$innerArray["IdName"].' value='.$innerArray["DisplayName"].' class="search-filter repository-selected noselect" onclick="toggleButtonClicked('.$rep.')" title="">'.$innerArray["DisplayName"].' </input> <div>';
+                }
+
+            }
+        }
+
+        ?>
+        
+
+        <input id="submitButton" type="submit" value="Submit" style="align:center;">
         
     </form>
 
@@ -141,14 +171,14 @@ aside {
     form.addEventListener('submit', formSubmit);
 
     //[FriendlyName, MachineName, IsInabled, ActiveByDefault (currently does nothing), title] 
-    const checkboxArray = [["People", "NA", false, false, "Search OCDLA members, expert witnesses, and judges."], ["Places", "NA", false, false, "Search cities and counties."], ["Library of Defence", "NA", false, false, "Search Library of Defense subject articles."], ["Blog", "NA", false, false, "Search Library of Defense blog posts."], ["Case Reviews", "Carstuff", false, false, "Search Criminal Appellate Review summaries."], ["Publications", "NA", false, false, "Search OCDLA publications."], ["Products", "ocdla_products", true, false, "Search OCDLA products."], ["Videos", "NA", false, false, "Search video transcripts from OCDLA seminars and events."], ["Seminars & Events", "NA", false, false, "Search OCDLA Events."], ["Motions", "NA", false, false, "Search the legacy motion bank."], ["ocdla.org", "NA", false, false, "Search the ocdla.org website."]];
+    //const checkboxArray = [["People", "NA", false, false, "Search OCDLA members, expert witnesses, and judges."], ["Places", "NA", false, false, "Search cities and counties."], ["Library of Defence", "NA", false, false, "Search Library of Defense subject articles."], ["Blog", "NA", false, false, "Search Library of Defense blog posts."], ["Case Reviews", "Carstuff", false, false, "Search Criminal Appellate Review summaries."], ["Publications", "NA", false, false, "Search OCDLA publications."], ["Products", "ocdla_products", true, false, "Search OCDLA products."], ["Videos", "NA", false, false, "Search video transcripts from OCDLA seminars and events."], ["Seminars & Events", "NA", false, false, "Search OCDLA Events."], ["Motions", "NA", false, false, "Search the legacy motion bank."], ["ocdla.org", "NA", false, false, "Search the ocdla.org website."]];
 
-    checkboxArray.forEach(repo => {
-        if (repo[2] == true) {
-            let element = document.getElementById("checkboxHolder");
-            let tag = `<input type="checkbox" id=${repo[0]} value=${repo[1]} class="search-filter repository-selected noselect" onclick="toggleButtonClicked(${repo[0]})" title="">${repo[0]}</input>
-            <div> `;
-            element.insertAdjacentHTML("beforeend", tag);
+    //checkboxArray.forEach(repo => {
+    //    if (repo[2] == true) {
+    //        let element = document.getElementById("checkboxHolder");
+    //        let tag = `<input type="checkbox" id=${repo[0]} value=${repo[1]} class="search-filter repository-selected noselect" onclick="toggleButtonClicked(${repo[0]})" title="">${repo[0]}</input>
+    //        <div> `;
+    //        element.insertAdjacentHTML("beforeend", tag);
             
-        }});
+    //    }});
 </script>
