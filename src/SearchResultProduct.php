@@ -39,7 +39,7 @@ class SearchResultProduct extends SearchResultSet implements ISnippet {
     }
 
 
-
+    public function getSnippets(){}
 
     public function loadDocuments($productIds)
     {

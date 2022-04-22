@@ -12,7 +12,7 @@ interface ISnippet {
 
     public function newResult($docId);
 
-    public function getSnippets();
+    //public function getSnippets();
 
 
 }

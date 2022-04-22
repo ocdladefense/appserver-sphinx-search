@@ -94,77 +94,83 @@ aside {
 
 </style>
 
-<script>
-    //needs to be in a start up function
+    <script>
+        //needs to be in a start up function
 
 
-    function toggleButtonClicked(buttonId) {
-        let button = document.getElementById(buttonId.id);
-        button.classList.toggle("repository-selected");
-        let localRepos = document.getElementById("repos");
+        function toggleButtonClicked(buttonId) {
+            let button = document.getElementById(buttonId.id);
+            button.classList.toggle("repository-selected");
+            let localRepos = document.getElementById("repos");
 
-        toggledButtons = document.querySelectorAll(".repository-selected");
+            toggledButtons = document.querySelectorAll(".repository-selected");
 
-        localRepos.value = "";
-        toggledButtons.forEach(button => {
-            let newRepoValue = localRepos.value + ' ' + button.id;
-            localRepos.value = newRepoValue;});
-        //console.log(buttonId.id);
-        
-    }
-
-    function formSubmit() {
-        let myString = document.getElementById("term").value;
-
-        if ((typeof myString === 'string' || myString instanceof String) && myString != "") {
-            document.getElementById("formbase").action = "/search/" + myString;
+            localRepos.value = "";
+            toggledButtons.forEach(button => {
+                let newRepoValue = localRepos.value + ' ' + button.id;
+                localRepos.value = newRepoValue;});
+            //console.log(buttonId.id);
+            
         }
-        else {
-            document.getElementById("formbase").action = "/search/page";
-        }
-        
-    }
 
-    //more script under html
-</script>
+        function formSubmit() {
+            let myString = document.getElementById("terms").value;
 
-<aside>
-    <form id="formbase" action="/test/1" method="post">
-        
-        <label for="term">Search Term: </label>
-        <input type="text" id="term" name="term">
-        <input type="hidden" id="repos" name="repos" value="People, Places, Library, Blog, Case, Publications, Products, Seminars, Motions, Videos, wiki_main">
-        <div />
-
-        
-
-        <?php 
-        
-        foreach ($repos as $innerArray) {
-            //  Check type
-            if (is_array($innerArray)){
-                //  Scan through inner loop
-                $rep = $innerArray["IdName"];
-                if ($innerArray["Render"] == true) {
-                    echo '<input type="checkbox" id='.$innerArray["IdName"].' value='.$innerArray["DisplayName"].' class="search-filter repository-selected noselect" onclick="toggleButtonClicked('.$rep.')" title="">'.$innerArray["DisplayName"].' </input> <div>';
-                }
-
+            if ((typeof myString === 'string' || myString instanceof String) && myString != "") {
+                document.getElementById("formbase").action = "/search/" + myString;
             }
+            else {
+                document.getElementById("formbase").action = "/search/page";
+            }
+            
         }
 
-        ?>
+        //more script under html
+    </script>
+
+    <div>
+    <aside>
+        <form id="formbase" action="/test/1" method="post">
+            
+            <label for="terms">Search Term: </label>
+            <input type="text" id="terms" name="terms" />
+            <input type="hidden" id="repos" name="repos" value="People, Places, Library, Blog, Case, Publications, Products, Seminars, Motions, Videos, wiki_main" />
+            <br />
+
+            
+
+            <?php
+            
+            foreach ($repos as $innerArray) {
+                //  Check type
+                if (is_array($innerArray)){
+                    //  Scan through inner loop
+                    $rep = $innerArray["IdName"];
+                    if ($innerArray["Render"] == true) {
+                        echo "<div> <input type='checkbox' id='{$innerArray["IdName"]}' name='repos[]' value='{$innerArray["RealName"]}' class='search-filter repository-selected noselect' title='' /> <label> {$innerArray["DisplayName"]} </label> </div>";
+                    }
+
+                }
+            }
+
+            ?>
+            
+
+            <input id="submitButton" type="submit" value="Submit" style="align:center;" />
+            
+        </form>
+
+        <div class="buttons" id="checkboxHolder">
+        
         
 
-        <input id="submitButton" type="submit" value="Submit" style="align:center;">
+        </div>
+
         
-    </form>
+    </aside>
 
-    <div class="buttons" id="checkboxHolder">
 
-    </div>
-
-    
-</aside>
+</div>
 
 <script>
     const form = document.getElementById('formbase');
