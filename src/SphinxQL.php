@@ -86,6 +86,7 @@ class SphinxQL {
 
     public static function getCallSnippets($documents, $indexName, $terms)
     {
+        //$term = implode(" ", $terms);
         $arr = self::prepareData($documents);
         $data = self::stringify($arr);
         $syntax = self::getSPHINXQLSyntax();

@@ -81,6 +81,10 @@ class SphinxModule extends Module {
         $client->connect();
 
 
+        $results->setClient($client);
+        $results->setTerms($terms);
+
+
         // Query the specified indexes
         // for the keywords.
         $indexes = "ocdla_products, ocdla_car, ocdla_members, wiki_main";
