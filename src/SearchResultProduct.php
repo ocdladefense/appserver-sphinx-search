@@ -73,14 +73,33 @@ class SearchResultProduct extends SearchResultSet implements ISnippet {
     }
 
 
+    public function getSnippets()
+    {
+        $desc = array_map(function($product) {
+            $html = $product['ClickpdxCatalog__HtmlDescription__c'];
+            $standard = $product["Description"];
 
+            $html = utf8_decode($html);
+            $html = preg_replace('/\x{00A0}+/mis', " ", $html);
+            
+            return empty($html) ? $standard : $html;
+        }, $this->results);
+
+        $this->documents = $desc;
+
+        $this->buildSnippets();
+
+    }
 
 
 
     public function newResult($docId) {
         $result     = $this->results[$docId];       
         $title      = $result["Name"];
-        $snippet    = substr(strip_tags($result["ClickpdxCatalog__HtmlDescription__c"]),0,255);
+        //$snippet    = substr(strip_tags($result["ClickpdxCatalog__HtmlDescription__c"]),0,255);
+
+        $snippet    = array_shift($this->snippets);
+        $snippet    = str_replace('&nbsp;', ' ', $snippet);
 
         $domain     = "https://ocdla.force.com";
         $result     = new SearchResult($title,$snippet,"{$domain}/OcdlaProduct?id={$docId}");

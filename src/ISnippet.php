@@ -9,10 +9,11 @@ interface ISnippet {
 
     public function loadDocuments($productIds);
 
+    public function getSnippets();
+
 
     public function newResult($docId);
 
-    //public function getSnippets();
 
 
 }

@@ -59,7 +59,10 @@ class SearchResultMember extends SearchResultSet implements ISnippet {
     }
 
 
-
+    public function getSnippets()
+    {
+        
+    }
 
 
 
