@@ -91,7 +91,9 @@ class SearchResult
         }
         // print $path;
         if(self::DEBUG === true && !is_readable($path)) {
-            throw new \exception("PATH_RESOLUTION_ERROR: The file does not exist or is not readable: {$path}.");
+
+            throw new \Exception("PATH_RESOLUTION_ERROR: The file does not exist or is not readable: {$path}.");
+
         }
 
         extract($params);

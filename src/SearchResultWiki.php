@@ -16,7 +16,8 @@ class SearchResultWiki extends SearchResultSet implements ISnippet {
     private static $query = "SELECT page_id, page_title, page_namespace, page_is_redirect, old_id, old_text FROM page, revision, text WHERE rev_id=page_latest AND old_id=rev_text_id AND page_id IN (:array)";
 
 
-
+    public function getSnippets(){}
+    
     public function __construct()
     {
       $this->index = "wiki_main";

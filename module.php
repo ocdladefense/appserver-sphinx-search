@@ -4,7 +4,96 @@
 
 
 class SphinxModule extends Module {
-
+  
+  const repoCheckboxes = array(
+    "People" => array(
+        "DisplayName" => "People", 
+        "IdName" => "People",
+        "RealName" => "ocdla_members",
+        "Render" => true,
+      "Checked" => false,
+      "Description" => "Search OCDLA members, expert witnesses, and judges."
+    ),
+    "Places" => array(
+        "DisplayName" => "Places", 
+        "IdName" => "Places",
+        "RealName" => null,
+        "Render" => false,
+      "Checked" => false,
+      "Description" => "Search cities and counties."
+    ),
+    "Library" => array(
+        "DisplayName" => "Library of Defence", 
+        "IdName" => "Library",
+        "RealName" => null,
+        "Render" => false,
+      "Checked" => false,
+      "Description" => "Search Library of Defense subject articles."
+    ),
+    "Blog" => array(
+        "DisplayName" => "Blog", 
+        "IdName" => "Blog",
+        "RealName" => null,
+        "Render" => false,
+      "Checked" => false,
+      "Description" => "Search Library of Defense blog posts."
+    ),
+    "Car" => array(
+        "DisplayName" => "Case Reviews", 
+        "IdName" => "Car",
+        "RealName" => "ocdla_car",
+        "Render" => true,
+      "Checked" => false,
+      "Description" => "Search Criminal Appellate Review summaries."
+    ),
+    "Publications" => array(
+        "DisplayName" => "Publications", 
+        "IdName" => "Publications",
+        "RealName" => null,
+        "Render" => false,
+      "Checked" => false,
+      "Description" => "Search OCDLA publications."
+    ),
+    "Products" => array(
+        "DisplayName" => "Products", 
+        "IdName" => "Products",
+        "RealName" => "ocdla_products",
+        "Render" => true,
+      "Checked" => true,
+      "Description" => "Search OCDLA products."
+    ),
+    "Videos" => array(
+        "DisplayName" => "Videos", 
+        "IdName" => "Videos",
+        "RealName" => null,
+        "Render" => false,
+      "Checked" => false,
+      "Description" => "Search video transcripts from OCDLA seminars and events."
+    ),
+    "Events" => array(
+        "DisplayName" => "Seminars & Events", 
+        "IdName" => "Events",
+        "RealName" => null,
+        "Render" => false,
+      "Checked" => false,
+      "Description" => "Search OCDLA Events."
+    ),
+    "Motions" => array(
+        "DisplayName" => "Motions", 
+        "IdName" => "Motions",
+        "RealName" => null,
+        "Render" => false,
+      "Checked" => false,
+      "Description" => "Search the legacy motion bank."
+    ),
+    "ocdla" => array(
+        "DisplayName" => "ocdla.org", 
+        "IdName" => "ocdla",
+        "RealName" => "wiki_main",
+        "Render" => true,
+      "Checked" => false,
+      "Description" => "Search the ocdla.org website."
+    ));
 
     private static $registered = array(
         "ocdla_products"        => "SearchResultProduct",
@@ -39,19 +128,24 @@ class SphinxModule extends Module {
 
     // Main callback; return a call to the SphinxQL method.
     public function doSearch($terms = null) {
-        if($terms == null)
-        {
-            $req = $this->getRequest();
-            $data = $req->getBody();
+        
+        $req = $this->getRequest();
+        $data = $req->getBody();
+        //var_dump($data->repos);
+        //var_dump($data->terms);
+        //exit;
+        $terms = $data->terms;
+        $repos = $data->repos;
+        
+        //exit;
+        //$terms = $data->term;
+        //if($terms == null)
+        //{
+        //    throw new exception("Search cannot be null");
+        //}
+        
 
-            $terms = $data->term;
-            if($terms == null)
-            {
-                throw new exception("Search cannot be null");
-            }
-        }
-
-        return $this->searchUsingSphinxQL($terms);
+        return $this->searchUsingSphinxQL($terms, $repos);
     }
 
 
@@ -64,7 +158,7 @@ class SphinxModule extends Module {
      * Example method to connect to a remote SphinxSearch server,
      * and return search results from a MATCH query.
      */
-    public function searchUsingSphinxQL($terms) {
+    public function searchUsingSphinxQL($terms, $repos) {
 
 
         // Iterable so we can loop through results.
@@ -80,6 +174,8 @@ class SphinxModule extends Module {
         $client = new SphinxQL($this->sphinxHost, $this->sphinxQLPort);
         $client->connect();
 
+        //var_dump($terms);
+        //exit;
 
         $results->setClient($client);
         $results->setTerms($terms);
@@ -87,11 +183,27 @@ class SphinxModule extends Module {
 
         // Query the specified indexes
         // for the keywords.
-        $indexes = "ocdla_products, ocdla_car, ocdla_members, wiki_main";
+        $indexes = "Na";
+        foreach ($repos as $repo) {
+          if ($indexes == "Na") {
+            $indexes = $repo;
+          }
+          else {
+            $indexes = $indexes.", ".$repo;
+          }
+        } 
+        if ($indexes = "Na") {
+          throw new \Exception("Querry_ERROR: The query did not retrieve any repositories.");
+        }
+        //$indexes = "ocdla_products, ocdla_car, ocdla_members, wiki_main"; //CHECKHERE
+        //var_dump($indexes);
+        //exit;
         $format = "SELECT * FROM %s WHERE MATCH('%s')";
         $query = sprintf($format, $indexes, $terms);
         $matches = $client->query($query);
 
+        //var_dump($matches);
+        //exit;
 
         while($match = mysqli_fetch_assoc($matches)) {
             // var_dump($match);
@@ -100,9 +212,10 @@ class SphinxModule extends Module {
             $id = $match["id"];
 
             $results->addMatch($match);
+            //var_dump($match);
         }
-
-        // exit;
+        //var_dump($results);
+        //exit;
 
         // Testing code to see if the delegate classes 
         // can actually load documents.
@@ -113,14 +226,15 @@ class SphinxModule extends Module {
 
         
         
-        $widget = new Template("widget");
-		$widget->addPath(__DIR__ . "/templates");
+        $widget = new Template("widget-checkboxes");
+		    $widget->addPath(__DIR__ . "/templates");
+        $widgetHTML = $widget->render(array("repos" => SphinxModule::repoCheckboxes));
 
         $page = new Template("results");
         $page->addPath(__DIR__ . "/templates");
         $list = $page->render(
             array(
-                "widget"    => $widget->render(),
+                "widget"    => $widgetHTML,
                 "terms"     => $terms,
                 "results"   => $results
             )

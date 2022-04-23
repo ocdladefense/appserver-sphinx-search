@@ -14,7 +14,6 @@ interface ISnippet {
 
     public function newResult($docId);
 
-    
 
 
 }
