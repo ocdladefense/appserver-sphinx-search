@@ -23,7 +23,7 @@ class SearchResultMember extends SearchResultSet implements ISnippet {
         $this->index = "ocdla_members";
     }
 
-    public function getSnippets(){}
+    
 
     public function getDocumentIds() {
 

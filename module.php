@@ -5,95 +5,107 @@
 
 class SphinxModule extends Module {
   
-  const repoCheckboxes = array(
+  const REPOSITORIES = array(
     "People" => array(
-        "DisplayName" => "People", 
-        "IdName" => "People",
-        "RealName" => "ocdla_members",
-        "Render" => true,
+      "DisplayName" => "People", 
+      "IdName" => "People",
+      "name" => "ocdla_members",
+      "active" => true,
+      "Render" => true,
       "Checked" => false,
       "Description" => "Search OCDLA members, expert witnesses, and judges."
     ),
     "Places" => array(
-        "DisplayName" => "Places", 
-        "IdName" => "Places",
-        "RealName" => null,
-        "Render" => false,
+      "DisplayName" => "Places", 
+      "IdName" => "Places",
+      "name" => null,
+      "active" => false,
+      "Render" => false,
       "Checked" => false,
       "Description" => "Search cities and counties."
     ),
     "Library" => array(
-        "DisplayName" => "Library of Defence", 
-        "IdName" => "Library",
-        "RealName" => null,
-        "Render" => false,
+      "DisplayName" => "Library of Defence", 
+      "IdName" => "Library",
+      "name" => "wiki_main",
+      "active" => true,
+      "Render" => false,
       "Checked" => false,
       "Description" => "Search Library of Defense subject articles."
     ),
     "Blog" => array(
-        "DisplayName" => "Blog", 
-        "IdName" => "Blog",
-        "RealName" => null,
-        "Render" => false,
+      "DisplayName" => "Blog", 
+      "IdName" => "Blog",
+      "name" => null,
+      "active" => false,
+      "Render" => false,
       "Checked" => false,
       "Description" => "Search Library of Defense blog posts."
     ),
     "Car" => array(
-        "DisplayName" => "Case Reviews", 
-        "IdName" => "Car",
-        "RealName" => "ocdla_car",
-        "Render" => true,
+      "DisplayName" => "Case Reviews", 
+      "IdName" => "Car",
+      "name" => "ocdla_car",
+      "active" => true,
+      "Render" => true,
       "Checked" => false,
       "Description" => "Search Criminal Appellate Review summaries."
     ),
     "Publications" => array(
-        "DisplayName" => "Publications", 
-        "IdName" => "Publications",
-        "RealName" => null,
-        "Render" => false,
+      "DisplayName" => "Publications", 
+      "IdName" => "Publications",
+      "name" => null,
+      "active" => false,
+      "Render" => false,
       "Checked" => false,
       "Description" => "Search OCDLA publications."
     ),
     "Products" => array(
-        "DisplayName" => "Products", 
-        "IdName" => "Products",
-        "RealName" => "ocdla_products",
-        "Render" => true,
+      "DisplayName" => "Products", 
+      "IdName" => "Products",
+      "name" => "ocdla_products",
+      "active" => true,
+      "Render" => true,
       "Checked" => true,
       "Description" => "Search OCDLA products."
     ),
     "Videos" => array(
-        "DisplayName" => "Videos", 
-        "IdName" => "Videos",
-        "RealName" => null,
-        "Render" => false,
+      "DisplayName" => "Videos", 
+      "IdName" => "Videos",
+      "name" => "videos",
+      "active" => false,
+      "Render" => false,
       "Checked" => false,
       "Description" => "Search video transcripts from OCDLA seminars and events."
     ),
     "Events" => array(
-        "DisplayName" => "Seminars & Events", 
-        "IdName" => "Events",
-        "RealName" => null,
-        "Render" => false,
+      "DisplayName" => "Seminars & Events", 
+      "IdName" => "Events",
+      "name" => "ocdla_events",
+      "active" => false,
+      "Render" => false,
       "Checked" => false,
       "Description" => "Search OCDLA Events."
     ),
     "Motions" => array(
-        "DisplayName" => "Motions", 
-        "IdName" => "Motions",
-        "RealName" => null,
-        "Render" => false,
+      "DisplayName" => "Motions", 
+      "IdName" => "Motions",
+      "name" => null,
+      "active" => false,
+      "Render" => false,
       "Checked" => false,
       "Description" => "Search the legacy motion bank."
     ),
     "ocdla" => array(
-        "DisplayName" => "ocdla.org", 
-        "IdName" => "ocdla",
-        "RealName" => "wiki_main",
-        "Render" => true,
+      "DisplayName" => "ocdla.org", 
+      "IdName" => "ocdla",
+      "name" => "wiki_main",
+      "active" => false,
+      "Render" => true,
       "Checked" => false,
       "Description" => "Search the ocdla.org website."
-    ));
+    )
+  );
 
     private static $registered = array(
         "ocdla_products"        => "SearchResultProduct",
@@ -126,6 +138,15 @@ class SphinxModule extends Module {
     }
 
 
+    public function displaySearchForm() {
+
+      $search = new Template("search");
+      $search->addPath(__DIR__ . "/templates");
+      
+      return $search;
+    }
+
+
     // Main callback; return a call to the SphinxQL method.
     public function doSearch($terms = null) {
         
@@ -134,20 +155,31 @@ class SphinxModule extends Module {
         //var_dump($data->repos);
         //var_dump($data->terms);
         //exit;
-        $terms = $data->terms;
-        $repos = $data->repos;
-        
-        //exit;
-        //$terms = $data->term;
-        //if($terms == null)
-        //{
-        //    throw new exception("Search cannot be null");
-        //}
-        
+        // $terms = $data->terms
+        $repos = $data->repos ?? SphinxModule::REPOSITORIES;
+
 
         return $this->searchUsingSphinxQL($terms, $repos);
     }
 
+
+
+    private function formatRepositories($repos) {
+
+      
+
+      $selected = array_filter($repos, function($repo) {
+        return array_key_exists($repo, SphinxModule::REPOSITORIES);
+      });
+
+      return array_filter($repos, function($repo) { return $repo["active"] === true; });
+    }
+
+
+    private function getActiveRepositories() {
+
+      return array_filter(SphinxModule::REPOSITORIES, function($repo) { return $repo["active"] === true; });
+    }
 
 
 
@@ -183,7 +215,7 @@ class SphinxModule extends Module {
 
         // Query the specified indexes
         // for the keywords.
-        $indexes = "Na";
+
         foreach ($repos as $repo) {
           if ($indexes == "Na") {
             $indexes = $repo;
@@ -192,9 +224,7 @@ class SphinxModule extends Module {
             $indexes = $indexes.", ".$repo;
           }
         } 
-        if ($indexes = "Na") {
-          throw new \Exception("Querry_ERROR: The query did not retrieve any repositories.");
-        }
+ 
         //$indexes = "ocdla_products, ocdla_car, ocdla_members, wiki_main"; //CHECKHERE
         //var_dump($indexes);
         //exit;
@@ -228,7 +258,7 @@ class SphinxModule extends Module {
         
         $widget = new Template("widget-checkboxes");
 		    $widget->addPath(__DIR__ . "/templates");
-        $widgetHTML = $widget->render(array("repos" => SphinxModule::repoCheckboxes));
+        $widgetHTML = $widget->render(array("repos" => SphinxModule::REPOSITORIES));
 
         $page = new Template("results");
         $page->addPath(__DIR__ . "/templates");
