@@ -185,6 +185,10 @@ class SphinxModule extends Module {
         //var_dump($repos);
         //exit;
 
+        $results->setClient($client);
+        $results->setTerms($terms);
+
+
         // Query the specified indexes
         // for the keywords.
         $indexes = "Na";

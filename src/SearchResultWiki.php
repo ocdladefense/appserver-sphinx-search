@@ -62,12 +62,23 @@ class SearchResultWiki extends SearchResultSet implements ISnippet {
         }
     }
 
+    public function getSnippets()
+    {
+        $text = array_map(function($wiki){
+            return $wiki["old_text"];
+        }, $this->results);
 
+        $this->documents = $text;
+
+        $this->buildSnippets();
+    }
 
     public function newResult($docId) {
         $result = $this->results[$docId];       
         $title = $result["page_title"];
-        $snippet = substr($result["old_text"],0,255);
+        //$snippet = substr($result["old_text"],0,255);
+
+        $snippet    = array_shift($this->snippets);
 
         $result = new SearchResult($title,$snippet,"https://lod.ocdla.org/index.php?curid={$docId}");
         $result->setTemplate("wiki");

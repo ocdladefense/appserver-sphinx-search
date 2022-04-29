@@ -20,7 +20,7 @@ class SearchResultCar extends SearchResultSet implements ISnippet {
 
     public function __construct()
     {
-        $this->index = "ocdla_cars";
+        $this->index = "ocdla_car";
     }
 
 
@@ -30,7 +30,7 @@ class SearchResultCar extends SearchResultSet implements ISnippet {
         foreach(self::$matches as $id => $match) {
             $index = $match["indexname"];
             $altId = $match["alt_id"];
-            if("ocdla_cars" == $index) $this->results[$altId] = $match;
+            if("ocdla_car" == $index) $this->results[$altId] = $match;
         }
 
 
@@ -41,33 +41,50 @@ class SearchResultCar extends SearchResultSet implements ISnippet {
 
 
 
-    public function loadDocuments($productIds)
+    public function loadDocuments($carIds)
     {
-        $api = loadApi();
+        $params = array(
+            "host" => "35.162.222.119",
+            "user" => "intern",
+            "password" => "wEtktXd7",
+            "name" => "apptest"
+        );
 
+        Mysql\Database::setDefault($params);
+        $db = new Mysql\Database();
 
-        $soql = DbHelper::parseArray(self::$query, $productIds);
-
-        $result = $api->query($soql);
-
-        $products = $result->getRecords();
+        $cars = $db->select(self::$query,$carIds);
+        
 
         foreach($cars as $car) {
-            $this->results[$product["Id"]] = $product;
+            $this->results[$car["id"]] = $car;
+            //var_dump($car["id"]);
         }
-        // var_dump($this->results);exit;
+        //exit;
+        //var_dump($this->results);exit;
 
     }
 
 
+    public function getSnippets()
+    {
+        $summary = array_map(function($car){
+            return $car["summary"];
+        }, $this->results);
 
+        $this->documents = $summary;
+
+        $this->buildSnippets();
+    }
 
 
 
     public function newResult($docId) {
         $result     = $this->results[$docId];       
         $title      = $result["title"];
-        $snippet    = $result["summary"];
+        //$snippet    = $result["summary"];
+
+        $snippet    = array_shift($this->snippets);
 
         $domain     = "https://ocdla.app";
         $result     = new SearchResult($title,$snippet,"{$domain}/car/{$docId}");

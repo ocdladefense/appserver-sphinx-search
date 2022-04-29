@@ -36,16 +36,29 @@ class SearchResultSet implements \IteratorAggregate {
     // Store matches/results for a specific index.
     protected $results = array();
 
+    // @var client
+    // Stores the instance of SphinxQL
+    protected static $client;
+
     protected static $registered = array(
         "wiki_main" => "SearchResultWiki",
         "ocdla_products" => "SearchResultProduct",
-        "ocdla_members" => "SearchResultMember"
+        "ocdla_members" => "SearchResultMember",
+        "ocdla_car" => "SearchResultCar"
     );
 
     private $isInitialized = null;
     
 
+    public static function setClient($client){
+        self::$client = $client;
+        //var_dump($this->client);
+        //exit;
+    }
 
+    public static function setTerms($terms){
+        self::$terms = $terms;
+    }
 
 
     public function getMatch($prop = "alt_id", $altId) {
@@ -65,10 +78,27 @@ class SearchResultSet implements \IteratorAggregate {
 
 
 
-    public static function buildSnippets()
+    public function buildSnippets()
     {   
-        $qlsnippets = SphinxQL::call("snippets", $docs, $this->index, $terms);
-        $snippets = mysqli_query($conn, $qlsnippets);
+        //$client = new SphinxQL($this->sphinxHost, $this->sphinxQLPort);
+        //$client->connect();
+        //Could get passed in
+        $qlsnippets = SphinxQL::getCallSnippets($this->documents, $this->index, self::$terms);
+        //var_dump(self::$terms);
+        //exit;
+        $snippets = self::$client->query($qlsnippets);
+
+        while($row = mysqli_fetch_assoc($snippets))
+        {
+            $this->snippets[] = $row["snippet"]; 
+            //var_dump($row);
+            //print($row["snippet"]);
+        }
+        //exit;
+
+        
+        //var_dump($this->snippets);
+        //exit;
     }   
 
 
@@ -121,6 +151,7 @@ class SearchResultSet implements \IteratorAggregate {
         foreach(self::$handlers as $handler) {
             $altIds = $handler->getDocumentIds();
             $handler->loadDocuments($altIds);
+            $handler->getSnippets();
         }
 
         
