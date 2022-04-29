@@ -74,7 +74,7 @@ class SphinxModule extends Module {
         "DisplayName" => "Seminars & Events", 
         "IdName" => "Events",
         "RealName" => null,
-        "Render" => false,
+        "Render" => true,
       "Checked" => false,
       "Description" => "Search OCDLA Events."
     ),
@@ -93,6 +93,14 @@ class SphinxModule extends Module {
         "Render" => true,
       "Checked" => false,
       "Description" => "Search the ocdla.org website."
+    ),
+    "witness" => array(
+        "DisplayName" => "Expert Witness", 
+        "IdName" => "witness",
+        "RealName" => "wiki_main",
+        "Render" => true,
+      "Checked" => false,
+      "Description" => "Search through expert witness."
     ));
 
     private static $registered = array(
@@ -109,7 +117,7 @@ class SphinxModule extends Module {
 
     // Jose will update this IP with the public IP of OCDLA's database / search server.
     // This is the Elastic IP of the Database Server.
-    private $sphinxHost = "35.162.222.119"; 
+    private $sphinxHost = "54.189.138.226"; 
 
     // This is our SphinxQL port - let's use SQL syntax to query the search engine.
     private $sphinxQLPort = 9306; 
@@ -174,7 +182,7 @@ class SphinxModule extends Module {
         $client = new SphinxQL($this->sphinxHost, $this->sphinxQLPort);
         $client->connect();
 
-        //var_dump($terms);
+        //var_dump($repos);
         //exit;
 
         // Query the specified indexes
@@ -188,8 +196,9 @@ class SphinxModule extends Module {
             $indexes = $indexes.", ".$repo;
           }
         } 
-        if ($indexes = "Na") {
-          throw new \Exception("Querry_ERROR: The query did not retrieve any repositories.");
+        if ($indexes == "Na") {
+          //throw new \Exception("Querry_ERROR: The query did not retrieve any repositories.");
+          $indexes = "ocdla_members";
         }
         //$indexes = "ocdla_products, ocdla_car, ocdla_members, wiki_main"; //CHECKHERE
         //var_dump($indexes);
@@ -224,7 +233,7 @@ class SphinxModule extends Module {
         
         $widget = new Template("widget-checkboxes");
 		    $widget->addPath(__DIR__ . "/templates");
-        $widgetHTML = $widget->render(array("repos" => SphinxModule::repoCheckboxes));
+        $widgetHTML = $widget->render(array("repos" => SphinxModule::repoCheckboxes, "query"   => $query));
 
         $page = new Template("results");
         $page->addPath(__DIR__ . "/templates");
