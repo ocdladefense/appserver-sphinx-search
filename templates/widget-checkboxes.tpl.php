@@ -166,6 +166,7 @@ aside {
             <input type="hidden" name="query" value="<?php echo $query ?>"/>
             <input type="submit" value="Map View"/>
         </form>
+        
 
         
     </aside>

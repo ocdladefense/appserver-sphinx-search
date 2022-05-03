@@ -73,7 +73,7 @@ class SphinxModule extends Module {
     "Events" => array(
         "DisplayName" => "Seminars & Events", 
         "IdName" => "Events",
-        "RealName" => null,
+        "RealName" => "Event__c", //Event__c ocdla_events
         "Render" => true,
       "Checked" => false,
       "Description" => "Search OCDLA Events."
