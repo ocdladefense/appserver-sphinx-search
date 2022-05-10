@@ -73,7 +73,7 @@ class SphinxModule extends Module {
     "Events" => array(
         "DisplayName" => "Seminars & Events", 
         "IdName" => "Events",
-        "RealName" => "Event__c", //Event__c ocdla_events
+        "RealName" => "ocdla_events",
         "Render" => true,
       "Checked" => false,
       "Description" => "Search OCDLA Events."
@@ -97,7 +97,7 @@ class SphinxModule extends Module {
     "witness" => array(
         "DisplayName" => "Expert Witness", 
         "IdName" => "witness",
-        "RealName" => "wiki_main",
+        "RealName" => "ocdla_experts",
         "Render" => true,
       "Checked" => false,
       "Description" => "Search through expert witness."
