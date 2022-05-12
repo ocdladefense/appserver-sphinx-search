@@ -178,15 +178,4 @@ aside {
     const form = document.getElementById('formbase');
     form.addEventListener('submit', formSubmit);
 
-    //[FriendlyName, MachineName, IsInabled, ActiveByDefault (currently does nothing), title] 
-    //const checkboxArray = [["People", "NA", false, false, "Search OCDLA members, expert witnesses, and judges."], ["Places", "NA", false, false, "Search cities and counties."], ["Library of Defence", "NA", false, false, "Search Library of Defense subject articles."], ["Blog", "NA", false, false, "Search Library of Defense blog posts."], ["Case Reviews", "Carstuff", false, false, "Search Criminal Appellate Review summaries."], ["Publications", "NA", false, false, "Search OCDLA publications."], ["Products", "ocdla_products", true, false, "Search OCDLA products."], ["Videos", "NA", false, false, "Search video transcripts from OCDLA seminars and events."], ["Seminars & Events", "NA", false, false, "Search OCDLA Events."], ["Motions", "NA", false, false, "Search the legacy motion bank."], ["ocdla.org", "NA", false, false, "Search the ocdla.org website."]];
-
-    //checkboxArray.forEach(repo => {
-    //    if (repo[2] == true) {
-    //        let element = document.getElementById("checkboxHolder");
-    //        let tag = `<input type="checkbox" id=${repo[0]} value=${repo[1]} class="search-filter repository-selected noselect" onclick="toggleButtonClicked(${repo[0]})" title="">${repo[0]}</input>
-    //        <div> `;
-    //        element.insertAdjacentHTML("beforeend", tag);
-            
-    //    }});
 </script>

@@ -16,7 +16,7 @@ class SphinxModule extends Module {
     ),
     "Places" => array(
         "DisplayName" => "Places", 
-        "IdName" => "Places",
+        "IdName" => "Places", 
         "RealName" => null,
         "Render" => false,
       "Checked" => false,
@@ -87,7 +87,7 @@ class SphinxModule extends Module {
       "Description" => "Search the legacy motion bank."
     ),
     "ocdla" => array(
-        "DisplayName" => "ocdla.org", 
+        "DisplayName" => "Ocdla.org", 
         "IdName" => "ocdla",
         "RealName" => "wiki_main",
         "Render" => true,
