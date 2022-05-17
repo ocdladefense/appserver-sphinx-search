@@ -147,6 +147,7 @@ aside {
                     <label><?php print $repo["display"]; ?></label>
                 </div>
 
+
             <?php endforeach; ?>
 
             <div class="form-item">
@@ -155,6 +156,7 @@ aside {
             
         </form>
 
+
     </aside>
 
     </div>
@@ -162,6 +164,8 @@ aside {
 
 
 <script>
+
     const form = document.getElementById('search');
     // form.addEventListener('submit', formSubmit);
+
 </script>

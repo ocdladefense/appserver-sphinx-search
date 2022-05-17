@@ -98,6 +98,7 @@ class SphinxModule extends Module {
       "Checked" => false,
       "Description" => "Search the legacy motion bank."
     ),
+
     "ocdla.org" => array(
       "display" => "ocdla.org", 
       "id" => "ocdla",
@@ -107,9 +108,16 @@ class SphinxModule extends Module {
       "Checked" => false,
       "Description" => "Search the ocdla.org website."
     )
+  ),
+    "witness" => array(
+        "DisplayName" => "Expert Witness", 
+        "IdName" => "witness",
+        "RealName" => "ocdla_experts",
+        "Render" => true,
+      "Checked" => false,
+      "Description" => "Search through expert witness."
+    )
   );
-
-
 
     private static $registered = array(
         "ocdla_products"        => "SearchResultProduct",
@@ -125,7 +133,9 @@ class SphinxModule extends Module {
 
     // Jose will update this IP with the public IP of OCDLA's database / search server.
     // This is the Elastic IP of the Database Server.
-    private $sphinxHost = "54.189.138.226";
+
+    private $sphinxHost = "54.189.138.226"; 
+
 
     // This is our SphinxQL port - let's use SQL syntax to query the search engine.
     private $sphinxQLPort = 9306; 
@@ -210,7 +220,7 @@ class SphinxModule extends Module {
         $client = new SphinxQL($this->sphinxHost, $this->sphinxQLPort);
         $client->connect();
 
-        //var_dump($terms);
+        //var_dump($repos);
         //exit;
 
         $results->setClient($client);
@@ -219,10 +229,12 @@ class SphinxModule extends Module {
 
         // Query the specified indexes
         // for the keywords.
+
         $nrepos = array_map(function($repo) { return $repo["name"]; }, $repos);
         $indexes = implode(self::COMMA_SEPARATED, $nrepos);
         $indexes = "wiki_main";
  
+
         //$indexes = "ocdla_products, ocdla_car, ocdla_members, wiki_main"; //CHECKHERE
         //var_dump($indexes);
         //exit;
@@ -258,7 +270,9 @@ class SphinxModule extends Module {
 
         $widget = new Template("widget-checkboxes");
 		    $widget->addPath(__DIR__ . "/templates");
+
         $widgetHTML = $widget->render(array("repos" => $repos, "q" => $terms));
+
 
         $page = new Template("results");
         $page->addPath(__DIR__ . "/templates");
