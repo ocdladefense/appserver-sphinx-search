@@ -87,7 +87,7 @@ class SearchResultCar extends SearchResultSet implements ISnippet {
         $snippet    = array_shift($this->snippets);
 
         $domain     = "https://ocdla.app";
-        $result     = new SearchResult($title,$snippet,"{$domain}/car/{$docId}");
+        $result     = new SearchResult($title,$snippet,"{$domain}/car/list/{$docId}");
         $result->setTemplate("car");
 
         return $result;

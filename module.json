@@ -5,6 +5,10 @@
 	"files": ["ISnippet.php","SphinxQL.php","SearchResult.php","SearchResultSet.php","SearchResultProduct.php", "SearchResultMember.php","SearchResultWiki.php", "SearchResultCar.php"],
     "connectedApp": "default",
 	"routes": {
+        "search":{
+            "callback":"displaySearchForm",
+            "content-type":"text/html"
+        },
         "search/%terms":{
             "callback":"doSearch",
             "content-type":"text/html"
