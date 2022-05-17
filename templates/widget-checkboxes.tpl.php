@@ -129,62 +129,39 @@ aside {
     </script>
 
     <div>
+
     <aside>
-        <form id="formbase" action="/test/1" method="post">
+        <form id="search" action="/search" method="GET">
             
-            <label for="terms">Search Term: </label>
-            <input type="text" id="terms" name="terms" />
-            <input type="hidden" id="repos" name="repos" value="People, Places, Library, Blog, Case, Publications, Products, Seminars, Motions, Videos, wiki_main" />
-            <br />
+            <div class="form-item">
+                <label for="terms">Search Terms: </label>
+                <input type="text" id="terms" name="q" value="<?php print $q; ?>" />
+            </div>
 
-            
 
-            <?php
-            
-            foreach ($repos as $innerArray) {
-                //  Check type
-                if (is_array($innerArray)){
-                    //  Scan through inner loop
-                    $rep = $innerArray["IdName"];
-                    if ($innerArray["Render"] == true) {
-                        echo "<div> <input type='checkbox' id='{$innerArray["IdName"]}' name='repos[]' value='{$innerArray["RealName"]}' class='search-filter repository-selected noselect' title='' /> <label> {$innerArray["DisplayName"]} </label> </div>";
-                    }
 
-                }
-            }
+            <?php foreach($repos as $repo): ?>
 
-            ?>
-            
+                <div class="form-item">
+                    <input type='checkbox' id='<?php print $repo["id"]; ?>' name='repos[]' value='<?php print $repo["name"]; ?>' class='search-filter repository-selected noselect' title='' />
+                    <label><?php print $repo["display"]; ?></label>
+                </div>
 
-            <input id="submitButton" type="submit" value="Submit" style="align:center;" />
+            <?php endforeach; ?>
+
+            <div class="form-item">
+                <input id="submit" type="submit" value="Submit" style="align:center;" />
+            </div>
             
         </form>
 
-        <div class="buttons" id="checkboxHolder">
-        
-        
-
-        </div>
-
-        
     </aside>
 
+    </div>
 
-</div>
+
 
 <script>
-    const form = document.getElementById('formbase');
-    form.addEventListener('submit', formSubmit);
-
-    //[FriendlyName, MachineName, IsInabled, ActiveByDefault (currently does nothing), title] 
-    //const checkboxArray = [["People", "NA", false, false, "Search OCDLA members, expert witnesses, and judges."], ["Places", "NA", false, false, "Search cities and counties."], ["Library of Defence", "NA", false, false, "Search Library of Defense subject articles."], ["Blog", "NA", false, false, "Search Library of Defense blog posts."], ["Case Reviews", "Carstuff", false, false, "Search Criminal Appellate Review summaries."], ["Publications", "NA", false, false, "Search OCDLA publications."], ["Products", "ocdla_products", true, false, "Search OCDLA products."], ["Videos", "NA", false, false, "Search video transcripts from OCDLA seminars and events."], ["Seminars & Events", "NA", false, false, "Search OCDLA Events."], ["Motions", "NA", false, false, "Search the legacy motion bank."], ["ocdla.org", "NA", false, false, "Search the ocdla.org website."]];
-
-    //checkboxArray.forEach(repo => {
-    //    if (repo[2] == true) {
-    //        let element = document.getElementById("checkboxHolder");
-    //        let tag = `<input type="checkbox" id=${repo[0]} value=${repo[1]} class="search-filter repository-selected noselect" onclick="toggleButtonClicked(${repo[0]})" title="">${repo[0]}</input>
-    //        <div> `;
-    //        element.insertAdjacentHTML("beforeend", tag);
-            
-    //    }});
+    const form = document.getElementById('search');
+    // form.addEventListener('submit', formSubmit);
 </script>
