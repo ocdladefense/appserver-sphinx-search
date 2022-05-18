@@ -94,41 +94,17 @@ aside {
 
 </style>
 
-    <script>
-        //needs to be in a start up function
 
 
-        function toggleButtonClicked(buttonId) {
-            let button = document.getElementById(buttonId.id);
-            button.classList.toggle("repository-selected");
-            let localRepos = document.getElementById("repos");
-
-            toggledButtons = document.querySelectorAll(".repository-selected");
-
-            localRepos.value = "";
-            toggledButtons.forEach(button => {
-                let newRepoValue = localRepos.value + ' ' + button.id;
-                localRepos.value = newRepoValue;});
-            //console.log(buttonId.id);
-            
-        }
-
-        function formSubmit() {
-            let myString = document.getElementById("terms").value;
-
-            if ((typeof myString === 'string' || myString instanceof String) && myString != "") {
-                document.getElementById("formbase").action = "/search/" + myString;
-            }
-            else {
-                document.getElementById("formbase").action = "/search/page";
-            }
-            
-        }
-
-        //more script under html
-    </script>
 
     <div>
+
+    <?php
+    // Some testing code to figure out how to pre-check the 
+    // appropriate checkboxes.
+    // var_dump($repos); 
+    // var_dump($selected);
+    ?>
 
     <aside>
         <form id="search" action="/search" method="GET">
@@ -142,13 +118,17 @@ aside {
 
             <?php foreach($repos as $repo): ?>
 
+                <?php 
+                    $key = $repo["key"];
+                    $isSelected = isset($selected[$key]);
+                ?>
                 <div class="form-item">
-                    <input type='checkbox' id='<?php print $repo["id"]; ?>' name='repos[]' value='<?php print $repo["name"]; ?>' class='search-filter repository-selected noselect' title='' />
+                    <input type="checkbox" id="<?php print $repo["id"]; ?>" name="repos[]" value="<?php print $repo["name"]; ?>" class="search-filter repository-selected noselect" title="" <?php print ($isSelected ? "checked" : ""); ?> />
                     <label><?php print $repo["display"]; ?></label>
                 </div>
 
-
             <?php endforeach; ?>
+
 
             <div class="form-item">
                 <input id="submit" type="submit" value="Submit" style="align:center;" />
@@ -166,6 +146,5 @@ aside {
 <script>
 
     const form = document.getElementById('search');
-    // form.addEventListener('submit', formSubmit);
 
 </script>
