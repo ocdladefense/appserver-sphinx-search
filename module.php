@@ -8,7 +8,7 @@ class SphinxModule extends Module {
   const COMMA_SEPARATED = ",";
   
   const REPOSITORIES = array(
-    "people" => array(
+    "ocdla_members" => array(
       "key" => "people",
       "display" => "People", 
       "id" => "People",
@@ -38,7 +38,7 @@ class SphinxModule extends Module {
       "Checked" => false,
       "Description" => "Search video transcripts from OCDLA seminars and events."
     ),
-    "library" => array(
+    "wiki_main" => array(
       "key" => "library",
       "display" => "Library of Defense", 
       "id" => "Library",
@@ -58,7 +58,7 @@ class SphinxModule extends Module {
       "Checked" => false,
       "Description" => "Search Library of Defense blog posts."
     ),
-    "car" => array(
+    "ocdla_car" => array(
       "key" => "car",
       "display" => "Case Reviews", 
       "id" => "Car",
@@ -78,7 +78,7 @@ class SphinxModule extends Module {
       "Checked" => false,
       "Description" => "Search OCDLA publications."
     ),
-    "products" => array(
+    "ocdla_products" => array(
       "key" => "products",
       "display" => "Products", 
       "id" => "Products",
@@ -88,7 +88,7 @@ class SphinxModule extends Module {
       "Checked" => true,
       "Description" => "Search OCDLA products."
     ),
-    "events" => array(
+    "ocdla_events" => array(
       "key" => "events",
       "display" => "Seminars & Events", 
       "id" => "Events",
@@ -108,7 +108,7 @@ class SphinxModule extends Module {
       "Checked" => false,
       "Description" => "Search the legacy motion bank."
     ),
-    "ocdla.org" => array(
+    "wiki_main" => array(
       "key" => "ocdla.org",
       "display" => "ocdla.org", 
       "id" => "ocdla",
@@ -118,7 +118,7 @@ class SphinxModule extends Module {
       "Checked" => false,
       "Description" => "Search the ocdla.org website."
     ),
-    "experts" => array(
+    "ocdla_experts" => array(
       "key" => "experts",
       "display" => "Experts",
       "DisplayName" => "Expert Witness", 
@@ -167,7 +167,8 @@ class SphinxModule extends Module {
 
       $search = new Template("search");
       $search->addPath(__DIR__ . "/templates");
-      
+
+
       return !empty($_GET["q"]) ? $this->doSearch($_GET["q"]) : $search;
     }
 
@@ -175,13 +176,15 @@ class SphinxModule extends Module {
     // Main callback; return a call to the SphinxQL method.
     public function doSearch($terms = null) {
         
+        
+
         $req = $this->getRequest();
         $data = $req->getBody();
         //var_dump($data->repos);
         //var_dump($data->terms);
         //exit;
         // $terms = $data->terms
-        $repos = $data->repos;// ?? SphinxModule::REPOSITORIES; // ocdla_car,ocdla_events
+        $repos = $_GET["repos"];//$data->repos;// ?? SphinxModule::REPOSITORIES; // ocdla_car,ocdla_events
 
         $valid = null != $repos ? self::formatRepositories($repos) : self::getActiveRepositories(SphinxModule::REPOSITORIES);
 
@@ -192,12 +195,17 @@ class SphinxModule extends Module {
 
 
     private static function formatRepositories($repos) {
-
+      
       $selected = array_filter($repos, function($repo) {
         return array_key_exists($repo, SphinxModule::REPOSITORIES);
       });
 
-      return self::getActiveRepositories($selected);
+      $arr = array();
+      foreach ($selected as &$value) {
+        $arr[] = SphinxModule::REPOSITORIES[$value];
+      }
+      
+      return self::getActiveRepositories($arr);
     }
 
 
