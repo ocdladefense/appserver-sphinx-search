@@ -93,8 +93,8 @@ class SphinxModule extends Module {
       "display" => "Seminars & Events", 
       "id" => "Events",
       "name" => "ocdla_events",
-      "active" => false,
-      "Render" => false,
+      "active" => true,
+      "Render" => true,
       "Checked" => false,
       "Description" => "Search OCDLA Events."
     ),
@@ -113,7 +113,7 @@ class SphinxModule extends Module {
       "display" => "ocdla.org", 
       "id" => "ocdla",
       "name" => "wiki_main",
-      "active" => false,
+      "active" => true,
       "Render" => true,
       "Checked" => false,
       "Description" => "Search the ocdla.org website."
@@ -121,9 +121,9 @@ class SphinxModule extends Module {
     "ocdla_experts" => array(
       "key" => "experts",
       "display" => "Experts",
-      "DisplayName" => "Expert Witness", 
-      "IdName" => "witness",
-      "RealName" => "ocdla_experts",
+      "id" => "witness", 
+      "name" => "ocdla_experts",
+      "active" => true,
       "Render" => true,
       "Checked" => false,
       "Description" => "Search through expert witness."
@@ -135,7 +135,8 @@ class SphinxModule extends Module {
         "wiki_main"             => "SearchResultWiki",
         "ocdla_members"         => "SearchResultMember",
         "ocdla_experts"         => "SearchResultExpert",
-        "ocdla_car"             => "SearchResultCar"
+        "ocdla_car"             => "SearchResultCar",
+        "ocdla_events"          => "SearchResultEvent"
     );
 
 
@@ -251,7 +252,7 @@ class SphinxModule extends Module {
 
         $nrepos = array_map(function($repo) { return $repo["name"]; }, $repos);
         $indexes = implode(self::COMMA_SEPARATED, $nrepos);
-        // $indexes = "wiki_main";
+        //$indexes = "ocdla_experts";
  
 
         //$indexes = "ocdla_products, ocdla_car, ocdla_members, wiki_main"; //CHECKHERE
@@ -265,7 +266,6 @@ class SphinxModule extends Module {
         //exit;
 
         while($match = mysqli_fetch_assoc($matches)) {
-            // var_dump($match);
             $index = $match["indexname"];
             $alt_id = $match["alt_id"];
             $id = $match["id"];
@@ -273,8 +273,6 @@ class SphinxModule extends Module {
             $results->addMatch($match);
             //var_dump($match);
         }
-        //var_dump($results);
-        //exit;
 
         // Testing code to see if the delegate classes 
         // can actually load documents.
