@@ -27,15 +27,14 @@ class SearchResultCar extends SearchResultSet implements ISnippet {
 
     public function getDocumentIds() {
 
-        foreach(self::$matches as $id => $match) {
+        $filter = function($match) {
             $index = $match["indexname"];
-            $altId = $match["alt_id"];
-            if("ocdla_car" == $index) $this->results[$altId] = $match;
-        }
+            return "ocdla_car" == $index;
+        };
 
+        $filtered = array_filter(self::$matches, $filter);
 
-        // Returns DbSelectResult
-        return array_keys($this->results);
+        return array_map(function($match) { return $match["alt_id"]; }, $filtered);
     }
 
 
@@ -58,33 +57,28 @@ class SearchResultCar extends SearchResultSet implements ISnippet {
 
         foreach($cars as $car) {
             $this->results[$car["id"]] = $car;
-            //var_dump($car["id"]);
         }
-        //exit;
-        //var_dump($this->results);exit;
-
     }
 
 
     public function getSnippets()
     {
-        $summary = array_map(function($car){
+        $previews = array_map(function($car){
             return $car["summary"];
-        }, $this->results);
+        }, $this->documents);
 
-        $this->documents = $summary;
+        $snippets = self::buildSnippets($previews, $this->index);
 
-        $this->buildSnippets();
+        $this->snippets = array_combine(array_keys($this->documents), $snippets);
     }
 
 
 
     public function newResult($docId) {
-        $result     = $this->results[$docId];       
-        $title      = $result["title"];
-        //$snippet    = $result["summary"];
+        $doc        = $this->documents[$docId];       
+        $snippet    = $this->snippets[$docId];
 
-        $snippet    = array_shift($this->snippets);
+        $title      = $doc["title"];
 
         $domain     = "https://ocdla.app";
         $result     = new SearchResult($title,$snippet,"{$domain}/car/list/{$docId}");

@@ -27,41 +27,44 @@ class SearchResultVideo extends SearchResultSet implements ISnippet {
 
     public function getDocumentIds() {
 
-        foreach(self::$matches as $id => $match) {
+        $filter = function($match) {
             $index = $match["indexname"];
-            $altId = $match["alt_id"];
-            if("ocdla_videos" == $index) $this->results[$altId] = $match;
-        }
+            return "ocdla_videos" == $index;
+        };
 
+        $filtered = array_filter(self::$matches, $filter);
 
-        // Returns DbSelectResult
-        return array_keys($this->results);
+        return array_map(function($match) { return $match["alt_id"]; }, $filtered);
     }
 
 
     
 
-    public function loadDocuments($videoIds)
+    public function loadDocuments($recordIds)
     {
         $api = loadApi();
 
 
-        $soql = DbHelper::parseArray(self::$query, $videoIds);
+        $soql = DbHelper::parseArray(self::$query, $recordIds);
 
         $result = $api->query($soql);
 
-        $videos = $result->getRecords();
+        $docs = $result->getRecords();
 
-        foreach($videos as $video) {
-            $this->results[$video["Id"]] = $video;
-        }
-
+        $keys = array_map(function($doc) { return $doc["Id"]; }, $docs);
+       
+        $this->documents = array_combine($keys,$docs);
     }
 
 
+    // This function should be called loadSnippets, not getSnippets.
+    public function loadSnippets() {
+
+    }
+
     public function getSnippets()
     {
-        $desc = array_map(function($video) {
+        $previews = array_map(function($video) {
             $html = $video["Name"];
             $standard = $video["Name"];
 
@@ -69,22 +72,20 @@ class SearchResultVideo extends SearchResultSet implements ISnippet {
             $html = preg_replace('/\x{00A0}+/mis', " ", $html);
             
             return empty($html) ? $standard : $html;
-        }, $this->results);
+        }, $this->documents);
 
-        $this->documents = $desc;
+        $snippets = self::buildSnippets($previews, $this->index);
 
-        $this->buildSnippets();
-
+        $this->snippets = array_combine(array_keys($this->documents), $snippets);
     }
 
 
 
     public function newResult($docId) {
-        $result     = $this->results[$docId];       
-        $title      = $result["Name"];
-        //$snippet    = substr(strip_tags($result["ClickpdxCatalog__HtmlDescription__c"]),0,255);
+        $doc        = $this->documents[$docId];       
+        $snippet    = $this->snippets[$docId];
 
-        $snippet    = array_shift($this->snippets);
+        $title      = $doc["Name"];
         $snippet    = str_replace('&nbsp;', ' ', $snippet);
 
         $domain     = "https://ocdla.force.com";
