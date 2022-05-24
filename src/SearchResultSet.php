@@ -41,12 +41,13 @@ class SearchResultSet implements \IteratorAggregate {
     protected static $client;
 
     protected static $registered = array(
-        "ocdla_products"        => "SearchResultProduct",
         "wiki_main"             => "SearchResultWiki",
+        "ocdla_products"        => "SearchResultProduct",
         "ocdla_members"         => "SearchResultMember",
         "ocdla_experts"         => "SearchResultExpert",
         "ocdla_car"             => "SearchResultCar",
-        "ocdla_events"          => "SearchResultEvent"
+        "ocdla_events"          => "SearchResultEvent",
+        "ocdla_videos"          => "SearchResultVideo"
     );
 
     private $isInitialized = null;
@@ -157,21 +158,27 @@ class SearchResultSet implements \IteratorAggregate {
         }
 
         
+        /*
         foreach(self::$matches as $id => $match) {
             $index = $match["indexname"];
             $altId = $match["alt_id"];
+            $this->results[$altId] = $match; 
+            
             $class = self::$registered[$index];
             if(null == $class || !class_exists($class)) {
                 
                 $this->results[$altId] = $match;
+                //Unlike for subclasses this is all of the results.
             }
+            
         }
-        
+        */
         
         return (function () {
             
             while($match = next(self::$matches)) {
-            
+                //var_dump($match);
+                //exit;
                 $index = $match["indexname"];
                 $handler = self::$handlers[$index] ?? $this;
                 

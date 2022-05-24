@@ -28,12 +28,12 @@ class SphinxModule extends Module {
       "Checked" => false,
       "Description" => "Search cities and counties."
     ),
-    "videos" => array(
+    "ocdla_videos" => array(
       "key" => "videos",
       "display" => "Videos", 
       "id" => "Videos",
-      "name" => "videos",
-      "active" => false,
+      "name" => "ocdla_videos",
+      "active" => true,
       "Render" => false,
       "Checked" => false,
       "Description" => "Search video transcripts from OCDLA seminars and events."
