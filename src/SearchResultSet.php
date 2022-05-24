@@ -41,11 +41,13 @@ class SearchResultSet implements \IteratorAggregate {
     protected static $client;
 
     protected static $registered = array(
-        "wiki_main" => "SearchResultWiki",
-        "ocdla_products" => "SearchResultProduct",
-        "ocdla_members" => "SearchResultMember",
-        "ocdla_videos" => "SearchResultVideo",
-        "ocdla_car" => "SearchResultCar"
+        "wiki_main"             => "SearchResultWiki",
+        "ocdla_products"        => "SearchResultProduct",
+        "ocdla_members"         => "SearchResultMember",
+        "ocdla_experts"         => "SearchResultExpert",
+        "ocdla_car"             => "SearchResultCar",
+        "ocdla_events"          => "SearchResultEvent",
+        "ocdla_videos"          => "SearchResultVideo"
     );
 
     private $isInitialized = null;
