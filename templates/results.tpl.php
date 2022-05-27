@@ -18,3 +18,9 @@
 <?php foreach($results as $result): ?>
     <?php print $result->toHtml(); ?>
 <?php endforeach; ?>
+
+
+<script src="/modules/sphinx/assets/js/video.js">
+    //startFetch();
+</script>
+
