@@ -20,7 +20,7 @@
 <?php endforeach; ?>
 
 
-<script src="/modules/sphinx/assets/js/video.js">
-    //startFetch();
+
+<script src="/modules/sphinx/assets/js/components/video.js" type="module">
 </script>
 
