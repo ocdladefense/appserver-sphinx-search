@@ -11,14 +11,15 @@
 
 <?php print $widget; ?>
 
-<h2 class='summary'>
-    Showing results for <i><?php print $terms; ?></i>
-</h2>
+<div class="searchResults">
+    <h2 class='summary'>
+        Showing results for <i><?php print $terms; ?></i>
+    </h2>
 
-<?php foreach($results as $result): ?>
-    <?php print $result->toHtml(); ?>
-<?php endforeach; ?>
-
+    <?php foreach($results as $result): ?>
+        <?php print $result->toHtml(); ?>
+    <?php endforeach; ?>
+</div>
 
 
 <script src="/modules/sphinx/assets/js/components/video.js" type="module">
