@@ -73,36 +73,31 @@ class SearchResultSet implements \IteratorAggregate {
     public function addMatch($result)
     {
         $id = $result["id"];
-        $index = $result["indexname"];
-
         self::$matches[$id]= $result;
     }
 
 
 
 
-    public function buildSnippets()
+    public static function buildSnippets($documents, $index, $terms = null)
     {   
-        //$client = new SphinxQL($this->sphinxHost, $this->sphinxQLPort);
-        //$client->connect();
-        //Could get passed in
-        $qlsnippets = SphinxQL::getCallSnippets($this->documents, $this->index, self::$terms);
-        //var_dump(self::$terms);
-        //exit;
-        $snippets = self::$client->query($qlsnippets);
+        $terms = $terms ?? self::$terms;
 
-        while($row = mysqli_fetch_assoc($snippets))
-        {
-            $this->snippets[] = $row["snippet"]; 
-            //var_dump($row);
-            //print($row["snippet"]);
-        }
-        //exit;
-
+  
+        $spql = SphinxQL::getCallSnippets($documents, $index, $terms);
         
-        //var_dump($this->snippets);
-        //exit;
+        $result = self::$client->query($spql);
+        
+        
+  
+        while($row = mysqli_fetch_assoc($result))
+        {
+            $snippets[] = $row["snippet"]; 
+        }
+
+        return $snippets;
     }   
+
 
 
     public function init() {
@@ -158,34 +153,17 @@ class SearchResultSet implements \IteratorAggregate {
         }
 
         
-        /*
-        foreach(self::$matches as $id => $match) {
-            $index = $match["indexname"];
-            $altId = $match["alt_id"];
-            $this->results[$altId] = $match; 
-            
-            $class = self::$registered[$index];
-            if(null == $class || !class_exists($class)) {
-                
-                $this->results[$altId] = $match;
-                //Unlike for subclasses this is all of the results.
-            }
-            
-        }
-        */
-        
         return (function () {
-            
-            while($match = next(self::$matches)) {
-                //var_dump($match);
-                //exit;
+            $match = current(self::$matches);
+            do {
+
                 $index = $match["indexname"];
                 $handler = self::$handlers[$index] ?? $this;
                 
                 $result = $handler->newResult($match["alt_id"]);
-                
+
                 yield $result;
-            }
+            } while($match = next(self::$matches));
         })();
     }
 
