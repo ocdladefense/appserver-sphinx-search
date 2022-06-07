@@ -11,7 +11,7 @@ use Mysql\DbHelper;
 
 class SearchResultVideo extends SearchResultSet implements ISnippet {
 
-    private static $query = "SELECT Id, ResourceId__c, Name, Speakers__c, Description__c, IsPublic__c, Published__c, Date__c from Media__c WHERE Id IN (%s)";
+    private static $query = "SELECT Id, ResourceId__c, Name, Event__c, Event__r.Name, Speakers__c, Description__c, IsPublic__c, Published__c, Date__c from Media__c WHERE Id IN (%s)";
 
 
     private $template = "video";

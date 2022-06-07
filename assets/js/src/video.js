@@ -31,20 +31,21 @@ function youtubeDataApiToImage(videoObjects) {
     videoObjects.items.forEach(function (video) {
         let vid = video.id;
         
-        let anchor = createImage(video, "https://www.youtube.com/watch?v=", "medium", 200);
+        // https://ocdpartial-ocdla.cs198.force.com/Videos?id=a2A0a000009QSVQEA4
+        let anchor = createImage(video, video.id, "https://www.youtube.com/watch?v=", "medium", 200);
         let createdAnchor = View.createElement(anchor);
         document.getElementById(vid).appendChild(createdAnchor);
     } );
 }
 
-function createImage(info, linkUrl = "https://www.youtube.com/watch?v=", res = "medium", size = 200) {
+function createImage(info, pointerURL, linkUrl = "https://www.youtube.com/watch?v=", res = "medium", size = 200) {
     let thumbnails = info.snippet.thumbnails;
 
     res = ["default", "medium", "high", "standard", "maxres"].includes(res) ? res : "medium";
     let src = thumbnails[res].url;
 
     return (
-        <a href={linkUrl + info.id}>
+        <a href={linkUrl + pointerURL}>
             <img src={src} width={size+"px"} height="auto" />
         </a>
     );
