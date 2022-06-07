@@ -130,14 +130,7 @@ class SphinxModule extends Module {
     )
   );
 
-    private static $registered = array(
-        "ocdla_products"        => "SearchResultProduct",
-        "wiki_main"             => "SearchResultWiki",
-        "ocdla_members"         => "SearchResultMember",
-        "ocdla_experts"         => "SearchResultExpert",
-        "ocdla_car"             => "SearchResultCar",
-        "ocdla_events"          => "SearchResultEvent"
-    );
+
 
 
     // If we're experimenting then let's not bother returning the theme.
@@ -262,7 +255,7 @@ class SphinxModule extends Module {
         $query = sprintf($format, $indexes, $terms);
         $matches = $client->query($query);
 
-        //var_dump($matches);
+        // var_dump($matches);
         //exit;
 
         while($match = mysqli_fetch_assoc($matches)) {
@@ -271,7 +264,7 @@ class SphinxModule extends Module {
             $id = $match["id"];
 
             $results->addMatch($match);
-            //var_dump($match);
+            // var_dump($match);
         }
 
         // Testing code to see if the delegate classes 

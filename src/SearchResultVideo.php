@@ -11,7 +11,9 @@ use Mysql\DbHelper;
 
 class SearchResultVideo extends SearchResultSet implements ISnippet {
 
+
     private static $query = "SELECT Id, ResourceId__c, Name, Event__c, Event__r.Name, Speakers__c, Description__c, IsPublic__c, Published__c, Date__c from Media__c WHERE Id IN (%s)";
+
 
 
     private $template = "video";
@@ -25,68 +27,67 @@ class SearchResultVideo extends SearchResultSet implements ISnippet {
 
     public function getDocumentIds() {
 
-        foreach(self::$matches as $id => $match) {
+        $filter = function($match) {
             $index = $match["indexname"];
-            $altId = $match["alt_id"];
-            if("ocdla_videos" == $index) $this->results[$altId] = $match;
-        }
+            return "ocdla_videos" == $index;
+        };
 
+        $filtered = array_filter(self::$matches, $filter);
 
-        // Returns DbSelectResult
-        return array_keys($this->results);
+        return array_map(function($match) { return $match["alt_id"]; }, $filtered);
     }
 
 
     
 
-    public function loadDocuments($videoIds)
+    public function loadDocuments($recordIds)
     {
         $api = loadApi();
 
 
-        $soql = DbHelper::parseArray(self::$query, $videoIds);
-
+        $soql = DbHelper::parseArray(self::$query, $recordIds);
+        // var_dump($soql);exit;
         $result = $api->query($soql);
-
-        $videos = $result->getRecords();
-
-        foreach($videos as $video) {
-            $this->results[$video["Id"]] = $video;
-        }
-
+        
+        $docs = $result->getRecords();
+        
+        $keys = array_map(function($doc) { return $doc["Id"]; }, $docs);
+       
+        $this->documents = array_combine($keys,$docs);
     }
 
 
+    // This function should be called loadSnippets, not getSnippets.
+    public function loadSnippets() {
+
+    }
+
     public function getSnippets()
     {
-        $desc = array_map(function($video) {
-            $html = $video["Name"];
-            $standard = $video["Name"];
+        $previews = array_map(function($video) {
+            return $video["Name"];
+        }, $this->documents);
 
-            $html = utf8_decode($html);
-            $html = preg_replace('/\x{00A0}+/mis', " ", $html);
-            
-            return empty($html) ? $standard : $html;
-        }, $this->results);
-
-        $this->documents = $desc;
-
-        $this->buildSnippets();
-
+        $snippets = self::buildSnippets($previews, $this->index);
+        
+        $this->snippets = array_combine(array_keys($this->documents), $snippets);
     }
 
 
 
     public function newResult($docId) {
-        $result     = $this->results[$docId];       
-        $title      = $result["Name"];
-        $url        = $result["ResourceId__c"];
-        //$snippet    = substr(strip_tags($result["ClickpdxCatalog__HtmlDescription__c"]),0,255);
 
-        $snippet    = array_shift($this->snippets);
+        $doc        = $this->documents[$docId];       
+        $snippet    = $this->snippets[$docId];
+        $url        = $doc["ResourceId__c"];
+
+
+        $title      = $doc["Name"];
         $snippet    = str_replace('&nbsp;', ' ', $snippet);
 
-        $domain     = "https://ocdla.force.com";
+        $domain     = "https://ocdla.force.com/Videos";
+        $testDomain = "https://ocdpartial-ocdla.cs198.force.com/Videos";
+        
         $result     = new SearchResult($title,$snippet,$url);
         $result->setTemplate("video");
 

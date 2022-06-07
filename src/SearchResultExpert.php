@@ -25,41 +25,39 @@ class SearchResultExpert extends SearchResultSet implements ISnippet {
 
     public function getDocumentIds() {
 
-        foreach(self::$matches as $id => $match) {
+        $filter = function($match) {
             $index = $match["indexname"];
-            $altId = $match["alt_id"];
-            if("ocdla_experts" == $index) $this->results[$altId] = $match;
-        }
+            return "ocdla_experts" == $index;
+        };
 
+        $filtered = array_filter(self::$matches, $filter);
 
-        // Returns DbSelectResult
-        return array_keys($this->results);
+        return array_map(function($match) { return $match["alt_id"]; }, $filtered);
     }
 
 
 
 
-    public function loadDocuments($contactIds)
+    public function loadDocuments($recordIds)
     {
         $api = loadApi();
 
 
-        $soql = DbHelper::parseArray(self::$query, $contactIds);
+        $soql = DbHelper::parseArray(self::$query, $recordIds);
 
         $result = $api->query($soql);
 
-        $contacts = $result->getRecords();
+        $docs = $result->getRecords();
 
-        foreach($contacts as $contact) {
-            $this->results[$contact["Id"]] = $contact;
-        }
-        // var_dump($this->results);exit;
+        $keys = array_map(function($doc) { return $doc["Id"]; }, $docs);
+       
+        $this->documents = array_combine($keys,$docs);
     }
 
 
     public function getSnippets()
     {
-        $desc = array_map(function($expert){
+        $previews = array_map(function($expert){
             if($expert["AreasOfInterest__r"] != null)
             {
                 $expertise = $expert["AreasOfInterest__r"];
@@ -75,19 +73,20 @@ class SearchResultExpert extends SearchResultSet implements ISnippet {
                 $description = " ";
             }
             return $description;
-        }, $this->results);
+        }, $this->documents);
 
-        $this->documents = $desc;
+        $snippets = self::buildSnippets($previews, $this->index);
 
-        $this->buildSnippets();        
+        $this->snippets = array_combine(array_keys($this->documents), $snippets);
     }
 
 
 
     public function newResult($docId) {
-        $result     = $this->results[$docId];       
-        $title      = $result["Name"];
-        $snippet    = array_shift($this->snippets);
+        $doc        = $this->documents[$docId];       
+        $snippet    = $this->snippets[$docId];
+
+        $title      = $doc["Name"];
         $snippet    = str_replace('&nbsp;', ' ', $snippet);
 
         $domain     = "https://ocdla.app";

@@ -27,15 +27,14 @@ class SearchResultWiki extends SearchResultSet implements ISnippet {
 
     public function getDocumentIds() {
 
-        foreach(self::$matches as $id => $match) {
+        $filter = function($match) {
             $index = $match["indexname"];
-            $altId = $match["alt_id"];
-            if("wiki_main" == $index) $this->results[$altId] = $match;
-        }
+            return "wiki_main" == $index;
+        };
 
+        $filtered = array_filter(self::$matches, $filter);
 
-        // Returns DbSelectResult
-        return array_keys($this->results);
+        return array_map(function($match) { return $match["alt_id"]; }, $filtered);
     }
     
 
@@ -55,30 +54,29 @@ class SearchResultWiki extends SearchResultSet implements ISnippet {
         
         $records = $db->select(self::$query,$pageIds);
         
-       
+
         foreach($records as $record) {
             $altId = $record["page_id"];
-            $this->results[$altId] = $record;
+            $this->documents[$altId] = $record;
         }
     }
 
     public function getSnippets()
     {
-        $text = array_map(function($wiki){
+        $previews = array_map(function($wiki){
             return $wiki["old_text"];
-        }, $this->results);
+        }, $this->documents);
 
-        $this->documents = $text;
+        $snippets = self::buildSnippets($previews, $this->index);
 
-        $this->buildSnippets();
+        $this->snippets = array_combine(array_keys($this->documents), $snippets);
     }
 
     public function newResult($docId) {
-        $result = $this->results[$docId];       
-        $title = $result["page_title"];
-        //$snippet = substr($result["old_text"],0,255);
+        $doc        = $this->documents[$docId];       
+        $snippet    = $this->snippets[$docId];
 
-        $snippet    = array_shift($this->snippets);
+        $title = $doc["page_title"];
 
         $result = new SearchResult($title,$snippet,"https://lod.ocdla.org/index.php?curid={$docId}");
         $result->setTemplate("wiki");
