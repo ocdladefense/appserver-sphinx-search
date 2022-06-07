@@ -16,8 +16,6 @@ class SearchResultVideo extends SearchResultSet implements ISnippet {
 
     private $template = "video";
 
-
-
     public function __construct()
     {
         $this->index = "ocdla_videos";
@@ -82,14 +80,17 @@ class SearchResultVideo extends SearchResultSet implements ISnippet {
 
 
     public function newResult($docId) {
+
         $doc        = $this->documents[$docId];       
         $snippet    = $this->snippets[$docId];
+       $url        = $doc["ResourceId__c"];
+
 
         $title      = $doc["Name"];
         $snippet    = str_replace('&nbsp;', ' ', $snippet);
 
         $domain     = "https://ocdla.force.com";
-        $result     = new SearchResult($title,$snippet,"{$domain}/Videos?id={$docId}");
+        $result     = new SearchResult($title,$snippet,$url);
         $result->setTemplate("video");
 
         return $result;

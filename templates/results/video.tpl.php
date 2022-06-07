@@ -8,10 +8,12 @@
  *  $url A link to the document source.
  */
 ?>
-<div class="search-result search-result-video" style="margin-top:15px; padding-top:10px;border-top:1px solid #ccc;">
+
+
+
+<div id='<?php print $url; ?>' class="search-result search-result-video" style="margin-top:15px; padding-top:10px;border-top:1px solid #ccc;">
     <h2 style='font-size:12pt;'> 
-        I am a video
-        <a href='<?php print $url; ?>' target='_blank'>
+        <a href='<?php print 'https://www.youtube.com/watch?v='.$url; ?>' target='_blank'>
             <?php print $title; ?>
         </a>
     </h2>
