@@ -11,7 +11,7 @@ use Mysql\DbHelper;
 
 class SearchResultVideo extends SearchResultSet implements ISnippet {
 
-    private static $query = "SELECT Id, ResourceId__c, Name, Speakers__c, Description__c, IsPublic__c, Published__c, Date__c from Media__c WHERE Id IN (%s)";
+    private static $query = "SELECT Id, ResourceId__c, Name, Speakers__c, Description__c, IsPublic__c, Published__c, Date__c FROM Media__c WHERE Id IN (%s)";
 
 
     private $template = "video";
@@ -44,11 +44,11 @@ class SearchResultVideo extends SearchResultSet implements ISnippet {
 
 
         $soql = DbHelper::parseArray(self::$query, $recordIds);
-
+        // var_dump($soql);exit;
         $result = $api->query($soql);
-
+        
         $docs = $result->getRecords();
-
+        
         $keys = array_map(function($doc) { return $doc["Id"]; }, $docs);
        
         $this->documents = array_combine($keys,$docs);
@@ -63,17 +63,11 @@ class SearchResultVideo extends SearchResultSet implements ISnippet {
     public function getSnippets()
     {
         $previews = array_map(function($video) {
-            $html = $video["Name"];
-            $standard = $video["Name"];
-
-            $html = utf8_decode($html);
-            $html = preg_replace('/\x{00A0}+/mis', " ", $html);
-            
-            return empty($html) ? $standard : $html;
+            return $video["Name"];
         }, $this->documents);
 
         $snippets = self::buildSnippets($previews, $this->index);
-
+        
         $this->snippets = array_combine(array_keys($this->documents), $snippets);
     }
 
@@ -83,13 +77,15 @@ class SearchResultVideo extends SearchResultSet implements ISnippet {
 
         $doc        = $this->documents[$docId];       
         $snippet    = $this->snippets[$docId];
-       $url        = $doc["ResourceId__c"];
+        $url        = $doc["ResourceId__c"];
 
 
         $title      = $doc["Name"];
         $snippet    = str_replace('&nbsp;', ' ', $snippet);
 
-        $domain     = "https://ocdla.force.com";
+        $domain     = "https://ocdla.force.com/Videos";
+        $testDomain = "https://ocdpartial-ocdla.cs198.force.com/Videos";
+        
         $result     = new SearchResult($title,$snippet,$url);
         $result->setTemplate("video");
 
