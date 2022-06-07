@@ -1,7 +1,7 @@
 /** @jsx vNode */
 
 
-import { vNode, View } from '../../../node_modules/@ocdladefense/view/view.js';
+import { vNode, View } from '/node_modules/@ocdladefense/view/view.js';
 
 startFetch();
 
