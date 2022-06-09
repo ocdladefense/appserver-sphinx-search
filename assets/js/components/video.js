@@ -21,36 +21,31 @@ function startFetch() {
 }
 
 function youtubeDataApiToImage(videoObjects) {
+  var configphplink = "https://ocdla.force.com/Videos?id="; //"https://www.youtube.com/watch?v="
+
   videoObjects.items.forEach(function (video) {
     var vid = video.id;
-    var anchor = createImage(video, "https://www.youtube.com/watch?v=", "medium", 200);
+    var el = document.getElementById(vid); //https://ocdla.force.com/Videos?id=
+
+    var anchor = createImage(video, el.dataset.media, configphplink, "medium", 200);
     var createdAnchor = View.createElement(anchor);
     document.getElementById(vid).appendChild(createdAnchor);
   });
 }
 
-function createImage(info) {
-  var linkUrl = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "https://www.youtube.com/watch?v=";
-  var res = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "medium";
-  var size = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 200;
+function createImage(info, linkEnd) {
+  var linkUrl = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "https://www.youtube.com/watch?v=";
+  var res = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "medium";
+  var size = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 200;
   var thumbnails = info.snippet.thumbnails;
   res = ["default", "medium", "high", "standard", "maxres"].includes(res) ? res : "medium";
   var src = thumbnails[res].url;
   return vNode("a", {
-    href: linkUrl + info.id
+    href: linkUrl + linkEnd,
+    target: "_blank"
   }, vNode("img", {
     src: src,
     width: size + "px",
     height: "auto"
   }));
-  /*
-  let ytImage = document.createElement("img");
-  ytImage.setAttribute("src", src);
-  ytImage.setAttribute("width", size+"px");
-  ytImage.setAttribute("height", "auto");
-    let anchor = document.createElement("a");
-  anchor.setAttribute("href", linkUrl + info.id);
-  anchor.appendChild(ytImage);
-  */
-  //return anchor;
 }

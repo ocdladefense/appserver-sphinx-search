@@ -28,24 +28,34 @@ function startFetch() {
 
 function youtubeDataApiToImage(videoObjects) {
 
+    let configphplink = "https://ocdla.force.com/Videos?id="; //"https://www.youtube.com/watch?v="
+
     videoObjects.items.forEach(function (video) {
         let vid = video.id;
+        const el = document.getElementById(vid);
         
-        // https://ocdpartial-ocdla.cs198.force.com/Videos?id=a2A0a000009QSVQEA4
-        let anchor = createImage(video, video.id, "https://www.youtube.com/watch?v=", "medium", 200);
+        
+
+        //https://ocdla.force.com/Videos?id=
+        let anchor = createImage(video, el.dataset.media, configphplink, "medium", 200);
+
         let createdAnchor = View.createElement(anchor);
         document.getElementById(vid).appendChild(createdAnchor);
     } );
 }
 
-function createImage(info, pointerURL, linkUrl = "https://www.youtube.com/watch?v=", res = "medium", size = 200) {
+
+function createImage(info, linkEnd, linkUrl = "https://www.youtube.com/watch?v=", res = "medium", size = 200) {
+
     let thumbnails = info.snippet.thumbnails;
 
     res = ["default", "medium", "high", "standard", "maxres"].includes(res) ? res : "medium";
     let src = thumbnails[res].url;
 
     return (
-        <a href={linkUrl + pointerURL}>
+
+        <a href={linkUrl + linkEnd} target="_blank">
+
             <img src={src} width={size+"px"} height="auto" />
         </a>
     );

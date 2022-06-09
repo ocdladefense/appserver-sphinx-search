@@ -11,11 +11,9 @@
 
 
 
-<div id='<?php print $url; ?>' class="search-result search-result-video" style="margin-top:15px; padding-top:10px;border-top:1px solid #ccc;">
+<div id='<?php print $url; ?>' data-media='<?php print $id; ?>' class="search-result search-result-video" style="margin-top:15px; padding-top:10px;border-top:1px solid #ccc;">
     <h2 style='font-size:12pt;'> 
-        <a href='<?php print 'https://www.youtube.com/watch?v='.$url; ?>' target='_blank'>
-            <?php print $title; ?>
-        </a>
+        <?php print $title; ?>
     </h2>
     <div class="snippet">
         <?php print $snippet; ?>
