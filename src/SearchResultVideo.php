@@ -89,6 +89,7 @@ class SearchResultVideo extends SearchResultSet implements ISnippet {
         $testDomain = "https://ocdpartial-ocdla.cs198.force.com/Videos";
         
         $result     = new SearchResult($title,$snippet,$url);
+        $result->setId($doc["Id"]);
         $result->setTemplate("video");
 
         return $result;
