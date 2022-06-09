@@ -35,21 +35,27 @@ function youtubeDataApiToImage(videoObjects) {
         const el = document.getElementById(vid);
         
         
+
         //https://ocdla.force.com/Videos?id=
         let anchor = createImage(video, el.dataset.media, configphplink, "medium", 200);
+
         let createdAnchor = View.createElement(anchor);
         document.getElementById(vid).appendChild(createdAnchor);
     } );
 }
 
+
 function createImage(info, linkEnd, linkUrl = "https://www.youtube.com/watch?v=", res = "medium", size = 200) {
+
     let thumbnails = info.snippet.thumbnails;
 
     res = ["default", "medium", "high", "standard", "maxres"].includes(res) ? res : "medium";
     let src = thumbnails[res].url;
 
     return (
+
         <a href={linkUrl + linkEnd} target="_blank">
+
             <img src={src} width={size+"px"} height="auto" />
         </a>
     );
