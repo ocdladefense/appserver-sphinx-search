@@ -21,7 +21,7 @@ function startFetch() {
 }
 
 function youtubeDataApiToImage(videoObjects) {
-  var configphplink = "https://ocdla.force.com/Videos?id="; //"https://www.youtube.com/watch?v="
+  var configphplink = store_url + "/Videos?id="; //"https://www.youtube.com/watch?v="
 
   videoObjects.items.forEach(function (video) {
     var vid = video.id;

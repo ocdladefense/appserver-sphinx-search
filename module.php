@@ -44,9 +44,19 @@ class SphinxModule extends Module {
       "id" => "Library",
       "name" => "wiki_main",
       "active" => true,
-      "Render" => false,
+      "Render" => true,
       "Checked" => false,
       "Description" => "Search Library of Defense subject articles."
+    ),
+    "ocdla.org" => array(
+      "key" => "ocdla.org",
+      "display" => "ocdla.org", 
+      "id" => "ocdla",
+      "name" => "wiki_main",
+      "active" => false,
+      "Render" => false,
+      "Checked" => false,
+      "Description" => "Search the ocdla.org website."
     ),
     "blog" => array(
       "key" => "blog",
@@ -107,16 +117,6 @@ class SphinxModule extends Module {
       "Render" => false,
       "Checked" => false,
       "Description" => "Search the legacy motion bank."
-    ),
-    "wiki_main" => array(
-      "key" => "ocdla.org",
-      "display" => "ocdla.org", 
-      "id" => "ocdla",
-      "name" => "wiki_main",
-      "active" => true,
-      "Render" => true,
-      "Checked" => false,
-      "Description" => "Search the ocdla.org website."
     ),
     "ocdla_experts" => array(
       "key" => "experts",

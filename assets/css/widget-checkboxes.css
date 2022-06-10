@@ -50,6 +50,21 @@ input[type=submit] {
     background-color: rgb(68, 80, 146);
 }
 
+.hamburger {
+    display: none;
+    cursor: pointer;
+}
+
+.bar {
+    display: block;
+    width: 25px;
+    height: 3px;
+    margin: 5px auto;
+    -webkit-transition: all 0.3 ease;
+    transition: all 0.3 ease;
+    background-color: black;
+}
+
 @media only screen and (max-width: 1150px) {
     .searchBar {
         width: 100%;
@@ -57,18 +72,61 @@ input[type=submit] {
         margin-top: 0px;
         padding-left: 15px;
         margin-left: 15px;
+        padding-right: 2px;
+        margin-right: 2px;
+        padding-bottom: 25px;
+        margin-bottom: 15px;
+        background-color: white;
+        font-style: italic;
+        display: inline-block;
+    }
+
+    .searchHamburger {
+        display: flex;
+    }
+
+    .searchTerms {
+        float: left;
+    }
+
+    .hamburger {
+        display: block;
+    }
+
+    .hamburger.active .bar:nth-child(2){
+        opacity: 0;
+    }
+
+    .hamburger.active .bar:nth-child(1){
+        transform: translateY(8px) rotate(45deg);
+    }
+
+    .hamburger.active .bar:nth-child(3){
+        transform: translateY(-8px) rotate(-45deg);
+    }
+
+    .checkboxLabel {
+        background-color: rgb(163, 161, 39);
+        color: black;
+    }
+
+    .noselect {
+        display:none;
+    }
+
+    .ham {
+        padding-top: 15px;
+        margin-top: 0px;
+        padding-left: 2px;
+        margin-left: 2px;
         padding-right: 15px;
         margin-right: 15px;
         padding-bottom: 25px;
         margin-bottom: 15px;
-        font-style: italic;
-        background-color: lightgray;
-        border-bottom-right-radius: 30px;
-        border-bottom-left-radius: 30px;
     }
 
     .form-item {
-        float: left;
+        display: block;
     }
 }
 
