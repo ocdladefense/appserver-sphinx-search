@@ -28,7 +28,8 @@ function startFetch() {
 
 function youtubeDataApiToImage(videoObjects) {
 
-    let configphplink = "https://ocdla.force.com/Videos?id="; //"https://www.youtube.com/watch?v="
+    let configphplink = store_url+"/Videos?id="; //"https://www.youtube.com/watch?v="
+    
 
     videoObjects.items.forEach(function (video) {
         let vid = video.id;

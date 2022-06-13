@@ -21,7 +21,9 @@
     <?php endforeach; ?>
 </div>
 
-
+<script>
+    const store_url = "<?php print STORE_URL ?>";
+</script>
 <script src="/modules/sphinx/assets/js/components/video.js" type="module">
 </script>
 
