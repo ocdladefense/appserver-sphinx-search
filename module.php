@@ -15,7 +15,7 @@ class SphinxModule extends Module {
       "name" => "ocdla_members",
       "active" => true,
       "Render" => true,
-      "Checked" => false,
+      "Checked" => true,
       "Description" => "Search OCDLA members, expert witnesses, and judges."
     ),
     "places" => array(
@@ -25,7 +25,7 @@ class SphinxModule extends Module {
       "name" => null,
       "active" => false,
       "Render" => false,
-      "Checked" => false,
+      "Checked" => true,
       "Description" => "Search cities and counties."
     ),
     "ocdla_videos" => array(
@@ -35,7 +35,7 @@ class SphinxModule extends Module {
       "name" => "ocdla_videos",
       "active" => true,
       "Render" => false,
-      "Checked" => false,
+      "Checked" => true,
       "Description" => "Search video transcripts from OCDLA seminars and events."
     ),
     "wiki_main" => array(
@@ -45,7 +45,7 @@ class SphinxModule extends Module {
       "name" => "wiki_main",
       "active" => true,
       "Render" => true,
-      "Checked" => false,
+      "Checked" => true,
       "Description" => "Search Library of Defense subject articles."
     ),
     "ocdla.org" => array(
@@ -55,7 +55,7 @@ class SphinxModule extends Module {
       "name" => "wiki_main",
       "active" => false,
       "Render" => false,
-      "Checked" => false,
+      "Checked" => true,
       "Description" => "Search the ocdla.org website."
     ),
     "blog" => array(
@@ -65,7 +65,7 @@ class SphinxModule extends Module {
       "name" => null,
       "active" => false,
       "Render" => false,
-      "Checked" => false,
+      "Checked" => true,
       "Description" => "Search Library of Defense blog posts."
     ),
     "ocdla_car" => array(
@@ -75,7 +75,7 @@ class SphinxModule extends Module {
       "name" => "ocdla_car",
       "active" => true,
       "Render" => true,
-      "Checked" => false,
+      "Checked" => true,
       "Description" => "Search Criminal Appellate Review summaries."
     ),
     "publications" => array(
@@ -85,7 +85,7 @@ class SphinxModule extends Module {
       "name" => null,
       "active" => false,
       "Render" => false,
-      "Checked" => false,
+      "Checked" => true,
       "Description" => "Search OCDLA publications."
     ),
     "ocdla_products" => array(
@@ -105,7 +105,7 @@ class SphinxModule extends Module {
       "name" => "ocdla_events",
       "active" => true,
       "Render" => true,
-      "Checked" => false,
+      "Checked" => true,
       "Description" => "Search OCDLA Events."
     ),
     "motions" => array(
@@ -115,7 +115,7 @@ class SphinxModule extends Module {
       "name" => null,
       "active" => false,
       "Render" => false,
-      "Checked" => false,
+      "Checked" => true,
       "Description" => "Search the legacy motion bank."
     ),
     "ocdla_experts" => array(
@@ -125,7 +125,7 @@ class SphinxModule extends Module {
       "name" => "ocdla_experts",
       "active" => true,
       "Render" => true,
-      "Checked" => false,
+      "Checked" => true,
       "Description" => "Search through expert witness."
     )
   );
@@ -174,9 +174,7 @@ class SphinxModule extends Module {
 
         $req = $this->getRequest();
         $data = $req->getBody();
-        //var_dump($data->repos);
-        //var_dump($data->terms);
-        //exit;
+        
         // $terms = $data->terms
         $repos = $_GET["repos"];//$data->repos;// ?? SphinxModule::REPOSITORIES; // ocdla_car,ocdla_events
 
@@ -233,8 +231,7 @@ class SphinxModule extends Module {
         $client = new SphinxQL($this->sphinxHost, $this->sphinxQLPort);
         $client->connect();
 
-        //var_dump($repos);
-        //exit;
+        
 
         $results->setClient($client);
         $results->setTerms($terms);
@@ -246,17 +243,14 @@ class SphinxModule extends Module {
         $nrepos = array_map(function($repo) { return $repo["name"]; }, $repos);
         $indexes = implode(self::COMMA_SEPARATED, $nrepos);
         //$indexes = "ocdla_experts";
- 
+        
 
         //$indexes = "ocdla_products, ocdla_car, ocdla_members, wiki_main"; //CHECKHERE
-        //var_dump($indexes);
-        //exit;
+        
         $format = "SELECT * FROM %s WHERE MATCH('%s')";
         $query = sprintf($format, $indexes, $terms);
         $matches = $client->query($query);
 
-        // var_dump($matches);
-        //exit;
 
         while($match = mysqli_fetch_assoc($matches)) {
             $index = $match["indexname"];
@@ -264,27 +258,31 @@ class SphinxModule extends Module {
             $id = $match["id"];
 
             $results->addMatch($match);
-            // var_dump($match);
+            
         }
 
         // Testing code to see if the delegate classes 
         // can actually load documents.
         // $set = new SearchResultWiki();
         // $set->loadDocuments(5442);
-        // var_dump($set->getResults());
-        // exit;
-
         
-        // var_dump($repos);exit;
+
+
 
 
         $widget = new Template("widget-checkboxes");
 		    $widget->addPath(__DIR__ . "/templates");
 
+        $reposGet = $_GET["repos"];
+        $checkedRepos = null != $reposGet ? self::formatRepositories($reposGet) : self::getActiveRepositories(SphinxModule::REPOSITORIES);
+        $nrepos = array_map(function($repo) { return $repo["name"]; }, $checkedRepos);
+        $indexes = implode(self::COMMA_SEPARATED, $nrepos);
+
         $widgetHTML = $widget->render(array(
           "repos"     => self::getActiveRepositories(),
           "selected"  => $repos,
-          "q"         => $terms
+          "q"         => $terms,
+          "checkedRepos" => $indexes
         ));
 
 

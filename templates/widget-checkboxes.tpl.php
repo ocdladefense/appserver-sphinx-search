@@ -23,7 +23,7 @@
             
             <div class="form-item searchHamburger">
                 <div class="searchTerms">
-                    <label for="terms">Search Terms: </label>
+                    <label for="terms" id="termLabel">Search Terms: </label>
                     <input type="text" id="terms" name="q" value="<?php print $q; ?>" />
                 </div>
 
@@ -44,10 +44,11 @@
                     <?php 
                         $key = $repo["key"];
                         $isSelected = isset($selected[$key]);
+
                     ?>
                     <div class="form-item">
-                        <input type="checkbox" id="<?php print $repo["id"]; ?>" name="repos[]" value="<?php print $repo["name"]; ?>" class="search-filter repository-selected noselect" title="" <?php print ($isSelected ? "checked" : ""); ?> checked/>
-                        <label for="<?php print $repo["id"]; ?>" class="checkboxLabel"><?php print $repo["display"]; ?></label>
+                        <input type="checkbox" id="<?php print $repo["id"]; ?>" name="repos[]" value="<?php print $repo["name"]; ?>" class="search-filter repository-selected noselect " title="" <?php print (str_contains($checkedRepos, $repo['name']) ? "checked " : ""); ?> />
+                        <label for="<?php print $repo["id"]; ?>" onclick="function(){}" class="checkboxLabel <?php print (str_contains($checkedRepos, $repo['name']) ? "checkToggled " : "checkUntoggled"); ?>"><?php print $repo["display"]; ?> </label>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -71,10 +72,17 @@
     const hamburger = document.querySelector(".hamburger");
     const checkboxes = document.querySelector(".checkboxes");
 
+    const checkboxLabels = document.querySelectorAll(".checkboxLabel");
+
     hamburger.addEventListener("click", () => {
         hamburger.classList.toggle("active");
         checkboxes.classList.toggle("noselect");
     });
+
+    checkboxLabels.forEach(element => element.addEventListener("click", () => {
+        element.classList.toggle("checkToggled");
+        element.classList.toggle("checkUntoggled");
+    }));
 
 
 
