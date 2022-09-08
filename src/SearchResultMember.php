@@ -81,7 +81,7 @@ class SearchResultMember extends SearchResultSet implements ISnippet {
         );
         $snippet = "OCDLA " . ($map[$status] ?? "Member");
 
-        $domain     = "https://ocdla.app";
+        $domain     = APP_URL;
         $result     = new SearchResult($title,$snippet,"{$domain}/directory/members/{$docId}");
         $result->setTemplate("member");
 

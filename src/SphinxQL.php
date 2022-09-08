@@ -24,7 +24,7 @@ class SphinxQL {
     protected static $defaultOptions = array(
         "around" => 10,
         "limit" => 300,
-        "query_mode" => 1,
+        // "query_mode" => 1, // this option is deprecated
         "html_strip_mode" => "'strip'",
         "before_match" => "'<mark class=\"result\">'",
         "after_match" => "'</mark>'"
@@ -57,7 +57,12 @@ class SphinxQL {
     public function query($query) {
 
         //@@relaxed
-        return mysqli_query($this->conn, $query);
+        $result = mysqli_query($this->conn, $query);
+        if(false === $result) {
+            throw new Exception(mysqli_error($this->conn));
+        }
+
+        return $result;
     }
 
 

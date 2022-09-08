@@ -42,10 +42,10 @@ class SearchResultWiki extends SearchResultSet implements ISnippet {
         $pageIds = is_array($pageIds) ? $pageIds : array($pageIds);
 
         $params = array(
-            "host" => "54.189.138.226",
-            "user" => "intern",
-            "password" => "wEtktXd7",
-            "name" => "lodwikitest"
+            "host"      => SPHINX_DOC_HOST,
+            "user"      => SPHINX_DOC_USER,
+            "password"  => SPHINX_DOC_PASS,
+            "name"      => SPHINX_DOC_WIKI
         );
 
 
@@ -67,6 +67,8 @@ class SearchResultWiki extends SearchResultSet implements ISnippet {
             return $wiki["old_text"];
         }, $this->documents);
 
+        if(null == $previews || count($previews) < 1) return array();
+        
         $snippets = self::buildSnippets($previews, $this->index);
 
         $this->snippets = array_combine(array_keys($this->documents), $snippets);
@@ -78,7 +80,7 @@ class SearchResultWiki extends SearchResultSet implements ISnippet {
 
         $title = $doc["page_title"];
 
-        $result = new SearchResult($title,$snippet,"https://lod.ocdla.org/index.php?curid={$docId}");
+        $result = new SearchResult($title,$snippet, LOD_URL . "/index.php?curid={$docId}");
         $result->setTemplate("wiki");
 
         return $result;
