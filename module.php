@@ -228,7 +228,7 @@ class SphinxModule extends Module {
         
         // Instantial a new SphinxQL client
         // that will make queries to the indexing service.
-        $client = new SphinxQL($this->sphinxHost, $this->sphinxQLPort);
+        $client = new SphinxQL(SPHINX_HOST, $this->sphinxQLPort);
         $client->connect();
 
         

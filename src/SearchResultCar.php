@@ -43,10 +43,10 @@ class SearchResultCar extends SearchResultSet implements ISnippet {
     public function loadDocuments($carIds)
     {
         $params = array(
-            "host" => "35.162.222.119",
-            "user" => "intern",
-            "password" => "wEtktXd7",
-            "name" => "apptest"
+            "host"      => SPHINX_DOC_HOST,
+            "user"      => SPHINX_DOC_USER,
+            "password"  => SPHINX_DOC_PASS,
+            "name"      => SPHINX_DOC_CAR
         );
 
         Mysql\Database::setDefault($params);
@@ -67,8 +67,10 @@ class SearchResultCar extends SearchResultSet implements ISnippet {
             return $car["summary"];
         }, $this->documents);
 
-        $snippets = self::buildSnippets($previews, $this->index);
+        if(null == $previews || count($previews) < 1) return array();
 
+        $snippets = self::buildSnippets($previews, $this->index);
+        // var_dump($snippets);exit;
         $this->snippets = array_combine(array_keys($this->documents), $snippets);
     }
 
@@ -80,7 +82,7 @@ class SearchResultCar extends SearchResultSet implements ISnippet {
 
         $title      = $doc["title"];
 
-        $domain     = "https://ocdla.app";
+        $domain     = APP_URL;
         $result     = new SearchResult($title,$snippet,"{$domain}/car/list/{$docId}");
         $result->setTemplate("car");
 

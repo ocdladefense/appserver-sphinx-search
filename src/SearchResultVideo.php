@@ -79,14 +79,13 @@ class SearchResultVideo extends SearchResultSet implements ISnippet {
 
         $doc        = $this->documents[$docId];       
         $snippet    = $this->snippets[$docId];
-        $url        = $doc["ResourceId__c"];
+        $id        = $doc["ResourceId__c"];
 
 
         $title      = $doc["Name"];
         $snippet    = str_replace('&nbsp;', ' ', $snippet);
 
-        $domain     = "https://ocdla.force.com/Videos";
-        $testDomain = "https://ocdpartial-ocdla.cs198.force.com/Videos";
+        $url     = STORE_URL . "/Videos?id=".$id;
         
         $result     = new SearchResult($title,$snippet,$url);
         $result->setId($doc["Id"]);

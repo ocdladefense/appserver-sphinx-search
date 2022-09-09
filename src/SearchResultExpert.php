@@ -89,7 +89,7 @@ class SearchResultExpert extends SearchResultSet implements ISnippet {
         $title      = $doc["Name"];
         $snippet    = str_replace('&nbsp;', ' ', $snippet);
 
-        $domain     = "https://ocdla.app";
+        $domain     = APP_URL;
         $result     = new SearchResult($title,$snippet,"{$domain}/directory/members/{$docId}");
         $result->setTemplate("expert");
 

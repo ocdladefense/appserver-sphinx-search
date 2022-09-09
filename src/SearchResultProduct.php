@@ -83,7 +83,7 @@ class SearchResultProduct extends SearchResultSet implements ISnippet {
         $title      = $doc["Name"];
         $snippet    = str_replace('&nbsp;', ' ', $snippet);
 
-        $domain     = "https://ocdla.force.com";
+        $domain     = STORE_URL;
         $result     = new SearchResult($title,$snippet,"{$domain}/OcdlaProduct?id={$docId}");
         $result->setTemplate("product");
 

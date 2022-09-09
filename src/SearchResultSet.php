@@ -86,6 +86,7 @@ class SearchResultSet implements \IteratorAggregate {
   
         $spql = SphinxQL::getCallSnippets($documents, $index, $terms);
         
+   
         $result = self::$client->query($spql);
         
         
