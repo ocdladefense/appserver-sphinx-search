@@ -47,7 +47,7 @@ class SearchResultWiki extends SearchResultSet implements ISnippet {
             "password"  => SPHINX_DOC_PASS,
             "name"      => SPHINX_DOC_WIKI
         );
-
+  
 
         Database::setDefault($params);
         $db = new Mysql\Database();
@@ -67,8 +67,6 @@ class SearchResultWiki extends SearchResultSet implements ISnippet {
             return $wiki["old_text"];
         }, $this->documents);
 
-        if(null == $previews || count($previews) < 1) return array();
-        
         $snippets = self::buildSnippets($previews, $this->index);
 
         $this->snippets = array_combine(array_keys($this->documents), $snippets);
@@ -80,7 +78,7 @@ class SearchResultWiki extends SearchResultSet implements ISnippet {
 
         $title = $doc["page_title"];
 
-        $result = new SearchResult($title,$snippet, LOD_URL . "/index.php?curid={$docId}");
+        $result = new SearchResult($title,$snippet,"https://lod.ocdla.org/index.php?curid={$docId}");
         $result->setTemplate("wiki");
 
         return $result;

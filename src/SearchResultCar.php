@@ -67,10 +67,8 @@ class SearchResultCar extends SearchResultSet implements ISnippet {
             return $car["summary"];
         }, $this->documents);
 
-        if(null == $previews || count($previews) < 1) return array();
-
         $snippets = self::buildSnippets($previews, $this->index);
-        // var_dump($snippets);exit;
+
         $this->snippets = array_combine(array_keys($this->documents), $snippets);
     }
 
@@ -82,7 +80,7 @@ class SearchResultCar extends SearchResultSet implements ISnippet {
 
         $title      = $doc["title"];
 
-        $domain     = APP_URL;
+        $domain     = "https://ocdla.app";
         $result     = new SearchResult($title,$snippet,"{$domain}/car/list/{$docId}");
         $result->setTemplate("car");
 
