@@ -139,7 +139,7 @@ class SphinxModule extends Module {
     // Jose will update this IP with the public IP of OCDLA's database / search server.
     // This is the Elastic IP of the Database Server.
 
-    private $sphinxHost = "54.189.138.226"; 
+    private $sphinxHost = SPHINX_HOST;
 
 
     // This is our SphinxQL port - let's use SQL syntax to query the search engine.
@@ -228,7 +228,7 @@ class SphinxModule extends Module {
         
         // Instantial a new SphinxQL client
         // that will make queries to the indexing service.
-        $client = new SphinxQL(SPHINX_HOST, $this->sphinxQLPort);
+        $client = new SphinxQL($this->sphinxHost, $this->sphinxQLPort);
         $client->connect();
 
         
