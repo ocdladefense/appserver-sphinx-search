@@ -13,7 +13,7 @@
         <img src="/content/images/logo.png" />
     </div>
     <div class="form-item">
-        <input id="search" type="text" name="q" size="60" placeholder="Search directory, case reviews and library of defense..." />
+        <input id="module-search-form" type="text" name="q" size="60" placeholder="Search directory, case reviews and library of defense..." />
     </div>
 </form>
 
@@ -25,7 +25,7 @@
         text-align: center;
     }
 
-    #search {
+    #module-search-form {
         padding:10px;
         font-size:1.5em;
     }
