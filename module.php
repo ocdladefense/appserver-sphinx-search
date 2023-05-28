@@ -171,6 +171,7 @@ class SphinxModule extends Module {
     public function doSearch($terms = null) {
         
         
+        // return $this->doSearchJson($terms);
 
         $req = $this->getRequest();
         $data = $req->getBody();
@@ -184,6 +185,60 @@ class SphinxModule extends Module {
         return $this->searchUsingSphinxQL($terms, $valid);
     }
 
+
+    public function doSearchJson($terms = null) {
+
+      
+      // $repos = self::getActiveRepositories(SphinxModule::REPOSITORIES);
+
+      $terms = $_GET["q"];
+      $rname = $_GET["r"];
+      $repos = [self::REPOSITORIES[$rname]];
+      // Iterable so we can loop through results.
+      // Register any secondary handlers.  
+      // These will handle the loading of documents,
+      // and any optional snippet generation.
+      $results = new SearchResultSet();
+      
+
+      
+      // Instantial a new SphinxQL client
+      // that will make queries to the indexing service.
+      $client = new SphinxQL($this->sphinxHost, $this->sphinxQLPort);
+      $client->connect();
+
+      $results->setClient($client);
+      $results->setTerms($terms);
+
+
+      // Query the specified indexes
+      // for the keywords.
+      $nrepos = array_map(function($repo) { return $repo["name"]; }, $repos);
+      $indexes = implode(self::COMMA_SEPARATED, $nrepos);
+      //$indexes = "ocdla_experts";
+      
+
+      //$indexes = "ocdla_products, ocdla_car, ocdla_members, wiki_main"; //CHECKHERE
+      
+      $format = "SELECT id,title FROM %s WHERE MATCH('%s')";
+      $query = sprintf($format, $indexes, $terms);
+      $matches = $client->query($query);
+
+      $json = [];
+      while($match = mysqli_fetch_assoc($matches)) {
+          $index = $match["indexname"];
+          $alt_id = $match["alt_id"];
+          $id = $match["id"];
+
+          $json []= $match;
+          $results->addMatch($match);
+      }
+
+      // var_dump($json);
+      // exit;
+      // Should be converted to JSON by the framework.
+      return $json;
+    }
 
 
     private static function formatRepositories($repos) {
@@ -258,7 +313,6 @@ class SphinxModule extends Module {
             $id = $match["id"];
 
             $results->addMatch($match);
-            
         }
 
         // Testing code to see if the delegate classes 

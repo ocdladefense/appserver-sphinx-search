@@ -9,6 +9,10 @@
             "callback":"displaySearchForm",
             "content-type":"text/html"
         },
+        "search/query":{
+            "callback":"doSearchJson",
+            "content-type":"application/json"
+        },
         "search/%terms":{
             "callback":"doSearch",
             "content-type":"text/html"
